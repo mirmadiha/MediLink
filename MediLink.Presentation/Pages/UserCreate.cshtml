@@ -1,0 +1,48 @@
+﻿@using MediLink.Domain
+@model MediLink.Presentation.Models.CreateHospitalUserViewModel
+
+@{
+    ViewData["Title"] = "Create User";
+}
+
+<h2>Create Doctor or Patient</h2>
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div>
+        <label asp-for="FullName"></label>
+        <input asp-for="FullName" />
+        <span asp-validation-for="FullName" class="text-danger"></span>
+    </div>
+
+    <div style="margin-top:10px;">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div style="margin-top:10px;">
+        <label asp-for="Password"></label>
+        <input asp-for="Password" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+
+    <div style="margin-top:10px;">
+        <label asp-for="Role"></label>
+        <select asp-for="Role">
+            <option value="">Select role</option>
+            <option value="@Roles.Doctor">Doctor</option>
+            <option value="@Roles.Patient">Patient</option>
+        </select>
+        <span asp-validation-for="Role" class="text-danger"></span>
+    </div>
+
+    <div style="margin-top:15px;">
+        <button type="submit">Save</button>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

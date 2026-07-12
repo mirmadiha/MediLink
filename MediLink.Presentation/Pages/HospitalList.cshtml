@@ -1,0 +1,32 @@
+﻿@model IEnumerable<MediLink.Domain.Entities.Hospital>
+
+@{
+    ViewData["Title"] = "Hospitals";
+}
+
+<h2>Hospitals</h2>
+
+@if (TempData["Message"] != null)
+{
+    <p style="color:green;">@TempData["Message"]</p>
+}
+
+<p>
+    <a asp-action="Create">Create Hospital and Admin</a>
+</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Hospital Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var hospital in Model)
+        {
+            <tr>
+                <td>@hospital.Name</td>
+            </tr>
+        }
+    </tbody>
+</table>
