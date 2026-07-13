@@ -31,6 +31,9 @@ namespace MediLink.Infrastructure.Data
                 entity.Property(x => x.Specialization).HasMaxLength(150);
                 entity.Property(x => x.StateRegistrationNumber).HasMaxLength(100);
                 entity.Property(x => x.AbhaId).HasMaxLength(100);
+                entity.HasIndex(x => x.AbhaId)
+                    .IsUnique()
+                    .HasFilter("[AbhaId] IS NOT NULL");
             });
         }
     }

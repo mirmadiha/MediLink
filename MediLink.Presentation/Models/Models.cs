@@ -159,6 +159,54 @@ namespace MediLink.Presentation.Models
 
         [Required]
         [Display(Name = "ABHA ID")]
+        [RegularExpression("^\\d{14}$", ErrorMessage = "ABHA ID must be exactly 14 digits.")]
         public string AbhaId { get; set; } = string.Empty;
+
+        [Required]
+        [Display(Name = "OTP")]
+        [RegularExpression("^\\d{4}$", ErrorMessage = "Enter a valid 4-digit OTP.")]
+        public string OtpCode { get; set; } = string.Empty;
+    }
+
+    public class PatientLookupViewModel
+    {
+        public string FullName { get; set; } = string.Empty;
+        public string UserName { get; set; } = string.Empty;
+        public string AbhaId { get; set; } = string.Empty;
+    }
+
+    public class HospitalDoctorsPageViewModel
+    {
+        public List<HospitalUserListItemViewModel> Doctors { get; set; } = new();
+        public string SearchAbhaId { get; set; } = string.Empty;
+        public PatientLookupViewModel? Patient { get; set; }
+    }
+
+    public class DoctorDashboardViewModel
+    {
+        public string SearchAbhaId { get; set; } = string.Empty;
+        public PatientLookupViewModel? Patient { get; set; }
+    }
+
+    public class PrescriptionFormViewModel
+    {
+        [Required]
+        [DataType(DataType.Date)]
+        public DateTime Date { get; set; }
+
+        [Required]
+        [Display(Name = "Name")]
+        public string PatientName { get; set; } = string.Empty;
+
+        [Required]
+        public int? Age { get; set; }
+
+        [Required]
+        [Display(Name = "Prescription")]
+        public string PrescriptionText { get; set; } = string.Empty;
+
+        [Required]
+        [Display(Name = "Doctor's Signature")]
+        public string DoctorSignature { get; set; } = string.Empty;
     }
 }

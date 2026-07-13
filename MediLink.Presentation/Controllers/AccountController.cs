@@ -93,6 +93,14 @@ namespace MediLink.Presentation.Controllers
                 return View(model);
             }
 
+            var existingAbhaUser = await _userManager.Users
+                .FirstOrDefaultAsync(x => x.AbhaId == model.AbhaId);
+            if (existingAbhaUser != null)
+            {
+                ModelState.AddModelError(nameof(model.AbhaId), "ABHA ID already exists.");
+                return View(model);
+            }
+
             var user = new ApplicationUser
             {
                 UserName = model.Email,

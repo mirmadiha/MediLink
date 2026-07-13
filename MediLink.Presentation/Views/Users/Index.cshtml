@@ -1,4 +1,4 @@
-@model IEnumerable<HospitalUserListItemViewModel>
+@model HospitalDoctorsPageViewModel
 
 @{
     ViewData["Title"] = "Hospital Users";
@@ -13,6 +13,31 @@
 
 <p><a asp-action="Create">Create Doctor</a></p>
 
+<form asp-action="Index" method="get" style="margin-bottom: 1rem;">
+    <label for="abhaId">Search patient by ABHA ID</label>
+    <div style="display:flex; gap:0.75rem; align-items:end; margin-top:0.35rem; flex-wrap:wrap;">
+        <input id="abhaId" name="abhaId" value="@Model.SearchAbhaId" placeholder="Enter ABHA ID" />
+        <button type="submit">Search</button>
+    </div>
+</form>
+
+@if (!string.IsNullOrWhiteSpace(Model.SearchAbhaId))
+{
+    if (Model.Patient != null)
+    {
+        <div style="margin-bottom:1rem; padding:1rem; border:1px solid var(--border); border-radius:8px; background:#f8fafc;">
+            <h3 style="margin-top:0;">Patient Found</h3>
+            <p><strong>Name:</strong> @Model.Patient.FullName</p>
+            <p><strong>Username:</strong> @Model.Patient.UserName</p>
+            <p><strong>ABHA ID:</strong> @Model.Patient.AbhaId</p>
+        </div>
+    }
+    else
+    {
+        <p class="text-danger">No patient found for this ABHA ID.</p>
+    }
+}
+
 <table>
     <thead>
         <tr>
@@ -20,27 +45,22 @@
             <th>Username</th>
             <th>Specialization</th>
             <th>State Registration Number</th>
-            <th>Role</th>
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-    @foreach (var user in Model)
+    @foreach (var user in Model.Doctors)
     {
         <tr>
             <td>@user.FullName</td>
             <td>@user.Email</td>
             <td>@user.Specialization</td>
             <td>@user.StateRegistrationNumber</td>
-            <td>@user.Role</td>
             <td>
-                @if (user.Role == Roles.Doctor)
-                {
-                    <a asp-action="Edit" asp-route-id="@user.Id">Edit</a>
-                    <form asp-action="Delete" asp-route-id="@user.Id" method="post" style="display:inline; margin-left:10px;" onsubmit="return confirm('Delete this doctor?');">
-                        <button type="submit">Delete</button>
-                    </form>
-                }
+                <a asp-action="Edit" asp-route-id="@user.Id">Edit</a>
+                <form asp-action="Delete" asp-route-id="@user.Id" method="post" style="display:inline; margin-left:10px;" onsubmit="return confirm('Delete this doctor?');">
+                    <button type="submit">Delete</button>
+                </form>
             </td>
         </tr>
     }
