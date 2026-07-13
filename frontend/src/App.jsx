@@ -5,12 +5,18 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import PatientDashboard from "./pages/PatientDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
-import CreateDoctor from "./pages/CreateDoctor";
+import MasterDashboard from "./pages/MasterDashboard";
 
 function App() {
   const [doctors, setDoctors] = useState([
-    { id: "1", name: "Dr. Adrian Carter", username: "dr.carter@medilink.com", specialization: "Cardiology", stateRegistrationNumber: "JKMC123456" },
-    { id: "2", name: "Dr. Sarah Jenkins", username: "dr.jenkins@medilink.com", specialization: "Neurology", stateRegistrationNumber: "JKMC987654" }
+    { id: "1", name: "Dr. Adrian Carter", email: "dr.carter@medilink.com", specialization: "Cardiology", stateRegistrationNumber: "JKMC123456" },
+    { id: "2", name: "Dr. Sarah Jenkins", email: "dr.jenkins@medilink.com", specialization: "Neurology", stateRegistrationNumber: "JKMC987654" }
+  ]);
+
+  const [hospitals, setHospitals] = useState([
+    { id: "1", name: "District Hospital Srinagar", address: "Srinagar", adminName: "Amina Khan", status: "Active" },
+    { id: "2", name: "SMHS Hospital", address: "Srinagar", adminName: "Ahmed Shah", status: "Active" },
+    { id: "3", name: "SKIMS", address: "Srinagar", adminName: "Fatima Ali", status: "Active" }
   ]);
 
   return (
@@ -21,8 +27,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/patient/dashboard" element={<PatientDashboard />} />
         <Route path="/admin/dashboard" element={<AdminDashboard doctors={doctors} setDoctors={setDoctors} />} />
-        <Route path="/admin/create-doctor" element={<CreateDoctor doctors={doctors} setDoctors={setDoctors} />} />
-        <Route path="/admin/edit-doctor/:id" element={<CreateDoctor doctors={doctors} setDoctors={setDoctors} />} />
+        <Route path="/master-admin/dashboard" element={<MasterDashboard hospitals={hospitals} setHospitals={setHospitals} doctorsCount={doctors.length} />} />
       </Routes>
     </BrowserRouter>
   );
