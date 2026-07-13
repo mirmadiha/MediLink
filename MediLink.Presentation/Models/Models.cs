@@ -209,4 +209,44 @@ namespace MediLink.Presentation.Models
         [Display(Name = "Doctor's Signature")]
         public string DoctorSignature { get; set; } = string.Empty;
     }
+
+    public class MedicalRecordViewModel
+    {
+        public int Id { get; set; }
+
+        public string AbhaId { get; set; } = string.Empty;
+
+        [Display(Name = "Blood Group")]
+        public string? BloodGroup { get; set; }
+
+        [Display(Name = "Height (cm)")]
+        public double? Height { get; set; }
+
+        [Display(Name = "Weight (kg)")]
+        public double? Weight { get; set; }
+
+        [Display(Name = "Emergency Contact Name")]
+        public string? EmergencyContactName { get; set; }
+
+        [Display(Name = "Emergency Contact Number")]
+        public string? EmergencyContactNumber { get; set; }
+
+        [Display(Name = "Medical History")]
+        public string? MedicalHistory { get; set; }
+
+        [Display(Name = "Current Medications")]
+        public string? CurrentMedications { get; set; }
+
+        public string? Allergies { get; set; }
+
+        public string? Surgeries { get; set; }
+
+        [Display(Name = "Family History")]
+        public string? FamilyHistory { get; set; }
+
+        public string? Lifestyle { get; set; }
+
+        [Display(Name = "Doctor Notes")]
+        public string? DoctorNotes { get; set; }
+    }
 }

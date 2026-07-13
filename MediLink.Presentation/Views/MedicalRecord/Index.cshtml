@@ -1,0 +1,104 @@
+﻿@model MediLink.Presentation.Models.MedicalRecordViewModel
+
+@{
+    ViewData["Title"] = "Patient Medical Record";
+}
+
+<h2>Patient Medical Record</h2>
+
+@if (TempData["Message"] != null)
+{
+    <div style="color:green; margin-bottom:15px;">
+        @TempData["Message"]
+    </div>
+}
+
+<form asp-action="Index" method="post">
+
+    <input asp-for="Id" type="hidden" />
+    <input asp-for="AbhaId" type="hidden" />
+
+    <h3>Basic Information</h3>
+
+    <p>
+        <label asp-for="BloodGroup"></label><br />
+        <input asp-for="BloodGroup" />
+    </p>
+
+    <p>
+        <label asp-for="Height"></label><br />
+        <input asp-for="Height" />
+    </p>
+
+    <p>
+        <label asp-for="Weight"></label><br />
+        <input asp-for="Weight" />
+    </p>
+
+    <p>
+        <label asp-for="EmergencyContactName"></label><br />
+        <input asp-for="EmergencyContactName" />
+    </p>
+
+    <p>
+        <label asp-for="EmergencyContactNumber"></label><br />
+        <input asp-for="EmergencyContactNumber" />
+    </p>
+
+    <hr />
+
+    <h3>Medical Information</h3>
+
+    <p>
+        <label asp-for="MedicalHistory"></label><br />
+        <textarea asp-for="MedicalHistory" rows="4"></textarea>
+    </p>
+
+    <p>
+        <label asp-for="CurrentMedications"></label><br />
+        <textarea asp-for="CurrentMedications" rows="4"></textarea>
+    </p>
+
+    <p>
+        <label asp-for="Allergies"></label><br />
+        <textarea asp-for="Allergies" rows="4"></textarea>
+    </p>
+
+    <p>
+        <label asp-for="Surgeries"></label><br />
+        <textarea asp-for="Surgeries" rows="4"></textarea>
+    </p>
+
+    <p>
+        <label asp-for="FamilyHistory"></label><br />
+        <textarea asp-for="FamilyHistory" rows="4"></textarea>
+    </p>
+
+    <p>
+        <label asp-for="Lifestyle"></label><br />
+        <textarea asp-for="Lifestyle" rows="4"></textarea>
+    </p>
+
+    <p>
+        <label asp-for="DoctorNotes"></label><br />
+        <textarea asp-for="DoctorNotes" rows="4"></textarea>
+    </p>
+
+    <br />
+
+    <button type="submit">
+        💾 Save Medical Record
+    </button>
+
+    <a asp-controller="Doctor"
+       asp-action="AISummary"
+       asp-route-abhaId="@Model.AbhaId">
+        🧠 AI Summary
+    </a>
+
+    <a asp-controller="Doctor"
+       asp-action="Index">
+        ⬅ Back
+    </a>
+
+</form>

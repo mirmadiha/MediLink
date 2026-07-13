@@ -6,27 +6,69 @@
 
 <h2>Search Patient by ABHA ID</h2>
 
-<form asp-action="Index" method="get" style="margin-bottom: 1rem;">
-    <label for="abhaId">ABHA ID</label>
-    <div style="display:flex; gap:0.75rem; align-items:end; margin-top:0.35rem; flex-wrap:wrap;">
-        <input id="abhaId" name="abhaId" value="@Model.SearchAbhaId" placeholder="Enter ABHA ID" maxlength="14" />
-        <button type="submit">Search</button>
-    </div>
+<form asp-action="Index" method="get" style="margin-bottom:20px;">
+
+    <label>ABHA ID</label><br />
+
+    <input type="text"
+           name="abhaId"
+           value="@Model.SearchAbhaId"
+           placeholder="Enter ABHA ID"
+           maxlength="14" />
+
+    <button type="submit">
+        Search
+    </button>
+
 </form>
+
+@if (ViewBag.Debug != null)
+{
+    <p style="color:red">@ViewBag.Debug</p>
+}
 
 @if (!string.IsNullOrWhiteSpace(Model.SearchAbhaId))
 {
     if (Model.Patient != null)
     {
-        <div style="margin-bottom:1rem; padding:1rem; border:1px solid var(--border); border-radius:8px; background:#f8fafc;">
-            <h3 style="margin-top:0;">Patient Details</h3>
+        <div style="border:1px solid #ccc;padding:20px;border-radius:8px;">
+
+            <h3>Patient Details</h3>
+
             <p><strong>Name:</strong> @Model.Patient.FullName</p>
-            <p><strong>Username:</strong> @Model.Patient.UserName</p>
+
+            <p><strong>Email:</strong> @Model.Patient.UserName</p>
+
             <p><strong>ABHA ID:</strong> @Model.Patient.AbhaId</p>
+
+            <hr />
+
+            <div style="display:flex;gap:15px;flex-wrap:wrap;">
+
+                <a asp-controller="MedicalRecord"
+                   asp-action="Index"
+                   asp-route-abhaId="@Model.Patient.AbhaId">
+                    📋 View Medical Record
+                </a>
+
+                <a asp-action="AddPrescription"
+                   asp-route-abhaId="@Model.Patient.AbhaId">
+                    💊 Create Prescription
+                </a>
+
+                <a asp-action="AISummary"
+                   asp-route-abhaId="@Model.Patient.AbhaId">
+                    🧠 AI Clinical Summary
+                </a>
+
+            </div>
+
         </div>
     }
     else
     {
-        <p class="text-danger">No patient found for this ABHA ID.</p>
+        <p style="color:red;">
+            No patient found for this ABHA ID.
+        </p>
     }
 }

@@ -30,7 +30,11 @@ namespace MediLink.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    FullName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Contact = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Specialization = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
+                    StateRegistrationNumber = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    AbhaId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     HospitalId = table.Column<int>(type: "int", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -58,11 +62,38 @@ namespace MediLink.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Hospitals", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MedicalRecords",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AbhaId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    BloodGroup = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    Height = table.Column<double>(type: "float", nullable: true),
+                    Weight = table.Column<double>(type: "float", nullable: true),
+                    EmergencyContactName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    EmergencyContactNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    MedicalHistory = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CurrentMedications = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Allergies = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Surgeries = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FamilyHistory = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Lifestyle = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DoctorNotes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MedicalRecords", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -204,6 +235,13 @@ namespace MediLink.Infrastructure.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_AbhaId",
+                table: "AspNetUsers",
+                column: "AbhaId",
+                unique: true,
+                filter: "[AbhaId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
@@ -231,6 +269,9 @@ namespace MediLink.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Hospitals");
+
+            migrationBuilder.DropTable(
+                name: "MedicalRecords");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

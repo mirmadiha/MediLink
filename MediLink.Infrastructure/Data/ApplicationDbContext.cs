@@ -8,11 +8,12 @@ namespace MediLink.Infrastructure.Data
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-        : base(options)
+            : base(options)
         {
         }
 
         public DbSet<Hospital> Hospitals => Set<Hospital>();
+        public DbSet<MedicalRecord> MedicalRecords => Set<MedicalRecord>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -31,9 +32,28 @@ namespace MediLink.Infrastructure.Data
                 entity.Property(x => x.Specialization).HasMaxLength(150);
                 entity.Property(x => x.StateRegistrationNumber).HasMaxLength(100);
                 entity.Property(x => x.AbhaId).HasMaxLength(100);
+
                 entity.HasIndex(x => x.AbhaId)
                     .IsUnique()
                     .HasFilter("[AbhaId] IS NOT NULL");
+            });
+
+            builder.Entity<MedicalRecord>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.BloodGroup)
+                    .HasMaxLength(10);
+
+                entity.Property(x => x.EmergencyContactName)
+                    .HasMaxLength(100);
+
+                entity.Property(x => x.EmergencyContactNumber)
+                    .HasMaxLength(20);
+
+                entity.Property(x => x.AbhaId)
+                    .HasMaxLength(100)
+                    .IsRequired();
             });
         }
     }

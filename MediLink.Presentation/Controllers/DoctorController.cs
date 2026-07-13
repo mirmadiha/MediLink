@@ -31,18 +31,22 @@ namespace MediLink.Presentation.Controllers
                 var patient = await _userManager.Users
                     .FirstOrDefaultAsync(x => x.AbhaId == abhaId);
 
-                if (patient != null)
+                if(patient == null)
+                {
+                    ViewBag.Debug = "Patient NOT found in database.";
+                }
+                else
                 {
                     var roles = await _userManager.GetRolesAsync(patient);
-                    if (roles.Contains(Roles.Patient))
+
+                    ViewBag.Debug = $"Found user: {patient.FullName} | Roles: {string.Join(", ", roles)}";
+
+                    model.Patient = new PatientLookupViewModel
                     {
-                        model.Patient = new PatientLookupViewModel
-                        {
-                            FullName = patient.FullName,
-                            UserName = patient.UserName ?? string.Empty,
-                            AbhaId = patient.AbhaId ?? string.Empty
-                        };
-                    }
+                        FullName = patient.FullName,
+                        UserName = patient.UserName ?? string.Empty,
+                        AbhaId = patient.AbhaId ?? string.Empty
+                    };
                 }
             }
 
