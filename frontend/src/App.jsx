@@ -6,6 +6,7 @@ import Signup from "./pages/Signup";
 import PatientDashboard from "./pages/PatientDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import MasterDashboard from "./pages/MasterDashboard";
+import DoctorDashboard from "./pages/DoctorDashboard";
 
 function App() {
   const [doctors, setDoctors] = useState([
@@ -28,6 +29,7 @@ function App() {
         <Route path="/patient/dashboard" element={<PatientDashboard />} />
         <Route path="/admin/dashboard" element={<AdminDashboard doctors={doctors} setDoctors={setDoctors} />} />
         <Route path="/master-admin/dashboard" element={<MasterDashboard hospitals={hospitals} setHospitals={setHospitals} doctorsCount={doctors.length} />} />
+        <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
       </Routes>
     </BrowserRouter>
   );
