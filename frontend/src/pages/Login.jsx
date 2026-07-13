@@ -58,7 +58,7 @@ function Login() {
     e.preventDefault();
     if (validateForm()) {
       setIsSubmitting(true);
-      
+
       // Log the form data to console as requested
       console.log("Submitting login form:", {
         email: formData.email,
@@ -122,7 +122,7 @@ function Login() {
         <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-teal-100/40 rounded-full blur-3xl opacity-30 pointer-events-none"></div>
 
         <div className="max-w-6xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch relative">
-          
+
           {/* Left Column (Desktop Illustration Only) */}
           <div className="hidden lg:flex lg:col-span-5 flex-col justify-between p-8 bg-slate-900 border border-slate-800 text-white rounded-3xl relative overflow-hidden shadow-2xl">
             {/* Background design elements */}
@@ -193,7 +193,7 @@ function Login() {
           {/* Right Column (Login Form Card) */}
           <div className="col-span-12 lg:col-span-7 flex flex-col justify-center">
             <div className="bg-white border border-slate-200 shadow-xl rounded-2xl p-6 sm:p-8 max-w-xl w-full mx-auto relative">
-              
+
               {/* Header */}
               <div className="space-y-2 mb-6">
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
@@ -206,7 +206,7 @@ function Login() {
 
               {/* Form */}
               <form onSubmit={handleSubmit} className="space-y-5">
-                
+
                 {/* Email Address */}
                 <div>
                   <label htmlFor="email" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
@@ -223,9 +223,8 @@ function Login() {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="Enter your email address"
-                      className={`block w-full pl-10 pr-3 py-2.5 text-sm rounded-lg bg-slate-50 border ${
-                        errors.email ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50/10" : "border-slate-200 focus:border-blue-500 focus:ring-blue-500"
-                      } text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 transition-all`}
+                      className={`block w-full pl-10 pr-3 py-2.5 text-sm rounded-lg bg-slate-50 border ${errors.email ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50/10" : "border-slate-200 focus:border-blue-500 focus:ring-blue-500"
+                        } text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 transition-all`}
                     />
                   </div>
                   {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
@@ -247,9 +246,8 @@ function Login() {
                       value={formData.password}
                       onChange={handleChange}
                       placeholder="Enter your password"
-                      className={`block w-full pl-10 pr-10 py-2.5 text-sm rounded-lg bg-slate-50 border ${
-                        errors.password ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50/10" : "border-slate-200 focus:border-blue-500 focus:ring-blue-500"
-                      } text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 transition-all`}
+                      className={`block w-full pl-10 pr-10 py-2.5 text-sm rounded-lg bg-slate-50 border ${errors.password ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50/10" : "border-slate-200 focus:border-blue-500 focus:ring-blue-500"
+                        } text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 transition-all`}
                     />
                     <button
                       type="button"
