@@ -14,15 +14,18 @@ namespace MediLink.Presentation.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _environment;
 
         public AccountController(
             SignInManager<ApplicationUser> signInManager,
             UserManager<ApplicationUser> userManager,
-            ApplicationDbContext context)
+            ApplicationDbContext context,
+            IWebHostEnvironment environment)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _context = context;
+            _environment = environment;
         }
 
         [HttpGet]
@@ -168,6 +171,60 @@ namespace MediLink.Presentation.Controllers
                 HospitalName = hospital?.Name,
                 HospitalAddress = hospital?.Address
             });
+        }
+
+        [HttpGet]
+        [Authorize(Roles = Roles.Patient)]
+        public async Task<IActionResult> MyPrescriptions()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return RedirectToAction(nameof(Login));
+            }
+
+            if (string.IsNullOrWhiteSpace(user.AbhaId))
+            {
+                return View(new PatientPrescriptionPageViewModel
+                {
+                    PatientName = user.FullName
+                });
+            }
+
+            var model = new PatientPrescriptionPageViewModel
+            {
+                PatientName = user.FullName
+            };
+
+            var folderPath = Path.Combine(_environment.ContentRootPath, "Prescriptions");
+            if (!Directory.Exists(folderPath))
+            {
+                return View(model);
+            }
+
+            var safeAbhaId = SanitizeFileSegment(user.AbhaId);
+            var files = Directory.GetFiles(folderPath, $"{safeAbhaId}_*.txt")
+                .OrderByDescending(x => x)
+                .ToList();
+
+            foreach (var file in files)
+            {
+                model.Prescriptions.Add(new PrescriptionFileViewModel
+                {
+                    FileName = Path.GetFileName(file),
+                    CreatedOn = System.IO.File.GetCreationTime(file),
+                    Content = await System.IO.File.ReadAllTextAsync(file)
+                });
+            }
+
+            return View(model);
+        }
+
+        private static string SanitizeFileSegment(string value)
+        {
+            var invalid = Path.GetInvalidFileNameChars();
+            var sanitizedChars = value.Select(c => invalid.Contains(c) ? '_' : c).ToArray();
+            return new string(sanitizedChars).Replace(' ', '_');
         }
     }
 }

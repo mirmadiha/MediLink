@@ -52,3 +52,13 @@
         <dd>@Model.HospitalAddress</dd>
     }
 </dl>
+
+@if (User.IsInRole(Roles.Doctor))
+{
+    <p><a asp-controller="Doctor" asp-action="Index">Search Patient and Manage Prescriptions</a></p>
+}
+
+@if (User.IsInRole(Roles.Patient))
+{
+    <p><a asp-controller="Account" asp-action="MyPrescriptions">View My Prescriptions (Read Only)</a></p>
+}

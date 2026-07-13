@@ -31,8 +31,12 @@ else
     @if (User.IsInRole(Roles.Doctor))
     {
         <p><a asp-controller="Doctor" asp-action="Index">Search Patient by ABHA ID</a></p>
-        <p><a asp-controller="Doctor" asp-action="AddPrescription">Add Prescription</a></p>
         <p><a asp-controller="Doctor" asp-action="AISummary">AI Summary</a></p>
+    }
+
+    @if (User.IsInRole(Roles.Patient))
+    {
+        <p><a asp-controller="Account" asp-action="MyPrescriptions">View My Prescriptions</a></p>
     }
 
     <form asp-controller="Account" asp-action="Logout" method="post">

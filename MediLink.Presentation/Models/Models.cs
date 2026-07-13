@@ -171,8 +171,10 @@ namespace MediLink.Presentation.Models
     public class PatientLookupViewModel
     {
         public string FullName { get; set; } = string.Empty;
-        public string UserName { get; set; } = string.Empty;
-        public string AbhaId { get; set; } = string.Empty;
+        public string DateOfBirth { get; set; } = string.Empty;
+        public string Age { get; set; } = string.Empty;
+        public string BloodGroup { get; set; } = string.Empty;
+        public string PreviousDiseases { get; set; } = string.Empty;
     }
 
     public class HospitalDoctorsPageViewModel
@@ -195,6 +197,9 @@ namespace MediLink.Presentation.Models
         public DateTime Date { get; set; }
 
         [Required]
+        public string AbhaId { get; set; } = string.Empty;
+
+        [Required]
         [Display(Name = "Name")]
         public string PatientName { get; set; } = string.Empty;
 
@@ -208,5 +213,25 @@ namespace MediLink.Presentation.Models
         [Required]
         [Display(Name = "Doctor's Signature")]
         public string DoctorSignature { get; set; } = string.Empty;
+    }
+
+    public class PrescriptionFileViewModel
+    {
+        public string FileName { get; set; } = string.Empty;
+        public DateTime CreatedOn { get; set; }
+        public string Content { get; set; } = string.Empty;
+    }
+
+    public class DoctorPrescriptionPageViewModel
+    {
+        public string AbhaId { get; set; } = string.Empty;
+        public string PatientName { get; set; } = string.Empty;
+        public List<PrescriptionFileViewModel> Prescriptions { get; set; } = new();
+    }
+
+    public class PatientPrescriptionPageViewModel
+    {
+        public string PatientName { get; set; } = string.Empty;
+        public List<PrescriptionFileViewModel> Prescriptions { get; set; } = new();
     }
 }

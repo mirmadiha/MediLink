@@ -13,6 +13,7 @@
 
 <form asp-action="AddPrescription" method="post">
     <div asp-validation-summary="All" class="text-danger"></div>
+    <input asp-for="AbhaId" type="hidden" />
 
     <div>
         <label asp-for="Date"></label>

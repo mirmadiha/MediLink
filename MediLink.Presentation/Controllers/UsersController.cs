@@ -26,7 +26,7 @@ namespace MediLink.Presentation.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(string? abhaId = null)
+        public async Task<IActionResult> Index()
         {
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser?.HospitalId == null)
@@ -54,39 +54,12 @@ namespace MediLink.Presentation.Controllers
                     Id = user.Id,
                     FullName = user.FullName,
                     Email = user.Email ?? string.Empty,
-                    Role = roles.FirstOrDefault() ?? "",
                     Specialization = user.Specialization ?? string.Empty,
                     StateRegistrationNumber = user.StateRegistrationNumber ?? string.Empty
                 });
             }
 
-            var pageModel = new HospitalDoctorsPageViewModel
-            {
-                Doctors = rows,
-                SearchAbhaId = abhaId ?? string.Empty
-            };
-
-            if (!string.IsNullOrWhiteSpace(abhaId))
-            {
-                var patient = await _userManager.Users
-                    .FirstOrDefaultAsync(x => x.AbhaId == abhaId);
-
-                if (patient != null)
-                {
-                    var patientRoles = await _userManager.GetRolesAsync(patient);
-                    if (patientRoles.Contains(Roles.Patient))
-                    {
-                        pageModel.Patient = new PatientLookupViewModel
-                        {
-                            FullName = patient.FullName,
-                            UserName = patient.UserName ?? string.Empty,
-                            AbhaId = patient.AbhaId ?? string.Empty
-                        };
-                    }
-                }
-            }
-
-            return View(pageModel);
+            return View(rows);
         }
 
         [HttpGet]
