@@ -27,6 +27,13 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
+.topbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
 .container {
   max-width: 900px;
   margin: 0 auto;
@@ -48,6 +55,36 @@ body {
   text-decoration: none;
   font-weight: 700;
   color: var(--primary);
+}
+
+.top-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.topbar-logout {
+  margin: 0;
+  max-width: none;
+}
+
+.topbar-logout button {
+  padding: 0.45rem 0.85rem;
+}
+
+.page-tools {
+  margin-top: 1rem;
+}
+
+.back-button {
+  background: #edf5f9;
+  color: var(--primary);
+  border: 1px solid var(--border);
+  padding: 0.45rem 0.8rem;
+}
+
+.back-button:hover {
+  background: #dfeef5;
 }
 
 h1,
@@ -137,6 +174,16 @@ th {
 }
 
 @media (max-width: 640px) {
+  .topbar-inner {
+    flex-wrap: wrap;
+  }
+
+  .top-nav {
+    width: 100%;
+    justify-content: flex-end;
+    padding-bottom: 0.7rem;
+  }
+
   .content {
     padding: 1rem;
     margin-top: 0.8rem;

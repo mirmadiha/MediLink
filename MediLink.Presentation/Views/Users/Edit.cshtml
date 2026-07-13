@@ -1,14 +1,14 @@
-@model CreateHospitalUserViewModel
+@model EditHospitalUserViewModel
 
 @{
-    ViewData["Title"] = "Create User";
+    ViewData["Title"] = "Edit Doctor";
 }
 
-<h2>Create Doctor</h2>
-<p>Admins can create doctor accounts only. Patients must use the signup page.</p>
+<h2>Edit Doctor</h2>
 
-<form asp-action="Create" method="post">
+<form asp-action="Edit" method="post">
     <div asp-validation-summary="All" class="text-danger"></div>
+    <input asp-for="Id" type="hidden" />
 
     <div>
         <label asp-for="FullName"></label>
@@ -23,12 +23,6 @@
     </div>
 
     <div style="margin-top:10px;">
-        <label asp-for="Password"></label>
-        <input asp-for="Password" />
-        <span asp-validation-for="Password" class="text-danger"></span>
-    </div>
-
-    <div style="margin-top:10px;">
         <label asp-for="Specialization"></label>
         <input asp-for="Specialization" />
         <span asp-validation-for="Specialization" class="text-danger"></span>
@@ -39,8 +33,6 @@
         <input asp-for="StateRegistrationNumber" />
         <span asp-validation-for="StateRegistrationNumber" class="text-danger"></span>
     </div>
-
-    <input type="hidden" asp-for="Role" value="@Roles.Doctor" />
 
     <div style="margin-top:15px;">
         <button type="submit">Save</button>

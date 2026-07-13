@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using MediLink.Domain;
+using MediLink.Domain.Entities;
 using MediLink.Infrastructure.Data;
 using MediLink.Infrastructure.Identity;
 using MediLink.Presentation.Models;
@@ -38,16 +39,24 @@ namespace MediLink.Presentation.Controllers
                 .OrderBy(x => x.FullName)
                 .ToListAsync();
 
-            var rows = new List<object>();
+            var rows = new List<HospitalUserListItemViewModel>();
 
             foreach (var user in users)
             {
                 var roles = await _userManager.GetRolesAsync(user);
-                rows.Add(new
+                if (!roles.Contains(Roles.Doctor))
                 {
-                    user.FullName,
-                    user.Email,
-                    Role = roles.FirstOrDefault() ?? ""
+                    continue;
+                }
+
+                rows.Add(new HospitalUserListItemViewModel
+                {
+                    Id = user.Id,
+                    FullName = user.FullName,
+                    Email = user.Email ?? string.Empty,
+                    Role = roles.FirstOrDefault() ?? "",
+                    Specialization = user.Specialization ?? string.Empty,
+                    StateRegistrationNumber = user.StateRegistrationNumber ?? string.Empty
                 });
             }
 
@@ -68,9 +77,9 @@ namespace MediLink.Presentation.Controllers
                 return View(model);
             }
 
-            if (model.Role != Roles.Doctor && model.Role != Roles.Patient)
+            if (model.Role != Roles.Doctor)
             {
-                ModelState.AddModelError(nameof(model.Role), "Only Doctor or Patient can be created.");
+                ModelState.AddModelError(nameof(model.Role), "Only Doctor accounts can be created by admin.");
                 return View(model);
             }
 
@@ -92,6 +101,8 @@ namespace MediLink.Presentation.Controllers
                 UserName = model.Email,
                 Email = model.Email,
                 FullName = model.FullName,
+                Specialization = model.Specialization,
+                StateRegistrationNumber = model.StateRegistrationNumber,
                 HospitalId = currentUser.HospitalId,
                 EmailConfirmed = true
             };
@@ -110,6 +121,118 @@ namespace MediLink.Presentation.Controllers
             await _userManager.AddToRoleAsync(user, model.Role);
 
             TempData["Message"] = $"{model.Role} account created successfully.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(string id)
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser?.HospitalId == null)
+            {
+                return Forbid();
+            }
+
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null || user.HospitalId != currentUser.HospitalId)
+            {
+                return NotFound();
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+            if (!roles.Contains(Roles.Doctor))
+            {
+                return Forbid();
+            }
+
+            return View(new EditHospitalUserViewModel
+            {
+                Id = user.Id,
+                FullName = user.FullName,
+                Email = user.Email ?? string.Empty,
+                Specialization = user.Specialization ?? string.Empty,
+                StateRegistrationNumber = user.StateRegistrationNumber ?? string.Empty
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(EditHospitalUserViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser?.HospitalId == null)
+            {
+                return Forbid();
+            }
+
+            var user = await _userManager.FindByIdAsync(model.Id);
+            if (user == null || user.HospitalId != currentUser.HospitalId)
+            {
+                return NotFound();
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+            if (!roles.Contains(Roles.Doctor))
+            {
+                return Forbid();
+            }
+
+            var emailOwner = await _userManager.FindByEmailAsync(model.Email);
+            if (emailOwner != null && emailOwner.Id != user.Id)
+            {
+                ModelState.AddModelError(nameof(model.Email), "Email already exists.");
+                return View(model);
+            }
+
+            user.FullName = model.FullName;
+            user.Email = model.Email;
+            user.UserName = model.Email;
+            user.Specialization = model.Specialization;
+            user.StateRegistrationNumber = model.StateRegistrationNumber;
+
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+            {
+                foreach (var error in updateResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+
+                return View(model);
+            }
+
+            TempData["Message"] = "Doctor updated successfully.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(string id)
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser?.HospitalId == null)
+            {
+                return Forbid();
+            }
+
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null || user.HospitalId != currentUser.HospitalId)
+            {
+                return NotFound();
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+            if (!roles.Contains(Roles.Doctor))
+            {
+                return Forbid();
+            }
+
+            await _userManager.DeleteAsync(user);
+
+            TempData["Message"] = "Doctor deleted successfully.";
             return RedirectToAction(nameof(Index));
         }
     }

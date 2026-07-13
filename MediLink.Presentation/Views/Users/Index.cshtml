@@ -1,24 +1,27 @@
-@model IEnumerable<dynamic>
+@model IEnumerable<HospitalUserListItemViewModel>
 
 @{
     ViewData["Title"] = "Hospital Users";
 }
 
-<h2>Hospital Users</h2>
+<h2>Hospital Doctors</h2>
 
 @if (TempData["Message"] != null)
 {
     <p style="color: green;">@TempData["Message"]</p>
 }
 
-<p><a asp-action="Create">Create Doctor or Patient</a></p>
+<p><a asp-action="Create">Create Doctor</a></p>
 
 <table>
     <thead>
         <tr>
-            <th>Full Name</th>
-            <th>Email</th>
+            <th>Name</th>
+            <th>Username</th>
+            <th>Specialization</th>
+            <th>State Registration Number</th>
             <th>Role</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -27,7 +30,18 @@
         <tr>
             <td>@user.FullName</td>
             <td>@user.Email</td>
+            <td>@user.Specialization</td>
+            <td>@user.StateRegistrationNumber</td>
             <td>@user.Role</td>
+            <td>
+                @if (user.Role == Roles.Doctor)
+                {
+                    <a asp-action="Edit" asp-route-id="@user.Id">Edit</a>
+                    <form asp-action="Delete" asp-route-id="@user.Id" method="post" style="display:inline; margin-left:10px;" onsubmit="return confirm('Delete this doctor?');">
+                        <button type="submit">Delete</button>
+                    </form>
+                }
+            </td>
         </tr>
     }
     </tbody>

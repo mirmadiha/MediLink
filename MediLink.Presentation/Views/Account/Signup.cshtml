@@ -1,13 +1,13 @@
-﻿@using MediLink.Domain
-@model MediLink.Presentation.Models.CreateHospitalUserViewModel
+@model PatientSignupViewModel
 
 @{
-    ViewData["Title"] = "Create User";
+    ViewData["Title"] = "Signup";
 }
 
-<h2>Create Doctor or Patient</h2>
+<h2>Patient Signup</h2>
+<p>This signup page is for patients only.</p>
 
-<form asp-action="Create" method="post">
+<form asp-action="Signup" method="post">
     <div asp-validation-summary="All" class="text-danger"></div>
 
     <div>
@@ -29,20 +29,18 @@
     </div>
 
     <div style="margin-top:10px;">
-        <label asp-for="Role"></label>
-        <select asp-for="Role">
-            <option value="">Select role</option>
-            <option value="@Roles.Doctor">Doctor</option>
-            <option value="@Roles.Patient">Patient</option>
-        </select>
-        <span asp-validation-for="Role" class="text-danger"></span>
+        <label asp-for="ConfirmPassword"></label>
+        <input asp-for="ConfirmPassword" />
+        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+    </div>
+
+    <div style="margin-top:10px;">
+        <label asp-for="AbhaId"></label>
+        <input asp-for="AbhaId" />
+        <span asp-validation-for="AbhaId" class="text-danger"></span>
     </div>
 
     <div style="margin-top:15px;">
-        <button type="submit">Save</button>
+        <button type="submit">Create Patient Account</button>
     </div>
 </form>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}

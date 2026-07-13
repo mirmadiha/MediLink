@@ -2,21 +2,33 @@
     ViewData["Title"] = "Home";
 }
 
-<h2>MediLink Dashboard</h2>
-<p>Welcome, @User.Identity?.Name</p>
+<h2>Welcome to MediLink</h2>
 
-@if (User.IsInRole(Roles.MasterAdmin))
+@if (!User.Identity?.IsAuthenticated ?? true)
 {
-    <p><a asp-controller="Hospitals" asp-action="Index">Manage Hospitals</a></p>
-    <p><a asp-controller="Hospitals" asp-action="Create">Create Hospital and Admin</a></p>
-}
+    <p>Your healthcare access starts here. Please login or signup to continue.</p>
 
-@if (User.IsInRole(Roles.Admin))
+    <p><a asp-controller="Account" asp-action="Login">Login</a></p>
+    <p><a asp-controller="Account" asp-action="Signup">Signup (Patients Only)</a></p>
+}
+else
 {
-    <p><a asp-controller="Users" asp-action="Index">View Hospital Users</a></p>
-    <p><a asp-controller="Users" asp-action="Create">Create Doctor or Patient</a></p>
-}
+    <p>Welcome, @User.Identity?.Name</p>
 
-<form asp-controller="Account" asp-action="Logout" method="post">
-    <button type="submit">Logout</button>
-</form>
+    @if (User.IsInRole(Roles.MasterAdmin))
+    {
+        <p><a asp-controller="Hospitals" asp-action="Index">Manage Hospitals</a></p>
+        <p><a asp-controller="Hospitals" asp-action="Create">Create Hospital</a></p>
+        <p><a asp-controller="Hospitals" asp-action="CreateAdmin">Create Admin</a></p>
+    }
+
+    @if (User.IsInRole(Roles.Admin))
+    {
+        <p><a asp-controller="Users" asp-action="Index">View Hospital Users</a></p>
+        <p><a asp-controller="Users" asp-action="Create">Create Doctor</a></p>
+    }
+
+    <form asp-controller="Account" asp-action="Logout" method="post">
+        <button type="submit">Logout</button>
+    </form>
+}

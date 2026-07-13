@@ -21,11 +21,16 @@ namespace MediLink.Infrastructure.Data
             builder.Entity<Hospital>(entity =>
             {
                 entity.Property(x => x.Name).HasMaxLength(200).IsRequired();
+                entity.Property(x => x.Address).HasMaxLength(300).IsRequired();
             });
 
             builder.Entity<ApplicationUser>(entity =>
             {
                 entity.Property(x => x.FullName).HasMaxLength(200).IsRequired();
+                entity.Property(x => x.Contact).HasMaxLength(50);
+                entity.Property(x => x.Specialization).HasMaxLength(150);
+                entity.Property(x => x.StateRegistrationNumber).HasMaxLength(100);
+                entity.Property(x => x.AbhaId).HasMaxLength(100);
             });
         }
     }

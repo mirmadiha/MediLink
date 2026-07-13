@@ -1,0 +1,54 @@
+@model ProfileViewModel
+
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<h2>My Profile</h2>
+
+<dl>
+    <dt>Name</dt>
+    <dd>@Model.FullName</dd>
+
+    <dt>Username</dt>
+    <dd>@Model.UserName</dd>
+
+    <dt>Role</dt>
+    <dd>@Model.Role</dd>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Contact))
+    {
+        <dt>Contact</dt>
+        <dd>@Model.Contact</dd>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.Specialization))
+    {
+        <dt>Specialization</dt>
+        <dd>@Model.Specialization</dd>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.StateRegistrationNumber))
+    {
+        <dt>State Registration Number</dt>
+        <dd>@Model.StateRegistrationNumber</dd>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.AbhaId))
+    {
+        <dt>ABHA ID</dt>
+        <dd>@Model.AbhaId</dd>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.HospitalName))
+    {
+        <dt>Hospital</dt>
+        <dd>@Model.HospitalName</dd>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.HospitalAddress))
+    {
+        <dt>Hospital Address</dt>
+        <dd>@Model.HospitalAddress</dd>
+    }
+</dl>
