@@ -15,6 +15,7 @@ function DoctorDashboard() {
   const [patientFound, setPatientFound] = useState(false);
   const [resolvedPatientName, setResolvedPatientName] = useState("Aisha Ahmad");
   const [resolvedPatientAbhaId, setResolvedPatientAbhaId] = useState("");
+  const [patientReports, setPatientReports] = useState([]);
   const [doctorProfile, setDoctorProfile] = useState({
     fullName: "Doctor",
     userName: "",
@@ -95,6 +96,31 @@ function DoctorDashboard() {
   });
   const [formErrors, setFormErrors] = useState({});
 
+  function mapServerReportToUi(report) {
+    const lines = (report?.content || "").split(/\r?\n/);
+    const getValue = (prefix) => {
+      const line = lines.find((x) => x.startsWith(prefix));
+      return line ? line.replace(prefix, "").trim() : "";
+    };
+
+    const contentIndex = lines.findIndex((x) => x.trim() === "Content:");
+    const body = contentIndex >= 0 ? lines.slice(contentIndex + 1).join("\n").trim() : report?.content || "";
+
+    return {
+      id: report?.fileName || `rep-${Date.now()}`,
+      name: getValue("Title:") || report?.fileName || "Uploaded Report",
+      date: getValue("Date:") || new Date(report?.createdOn || Date.now()).toISOString().slice(0, 10),
+      result: body || "No report content available.",
+    };
+  }
+
+  function mergeReports(serverReports) {
+    const mappedServer = (serverReports || []).map(mapServerReportToUi);
+    const existingIds = new Set(mappedServer.map((x) => x.id));
+    const fallback = dummyPatient.reports.filter((x) => !existingIds.has(x.id));
+    return [...mappedServer, ...fallback];
+  }
+
   useEffect(() => {
     let mounted = true;
 
@@ -141,18 +167,23 @@ function DoctorDashboard() {
         setPatientFound(false);
         setResolvedPatientName(dummyPatient.name);
         setResolvedPatientAbhaId("");
+        setPatientReports(dummyPatient.reports);
         setSearched(true);
         return;
       }
 
+      const reportRows = await api.doctorReports(abhaId.trim());
+
       setResolvedPatientName(backendName);
       setResolvedPatientAbhaId(abhaId.trim());
+      setPatientReports(mergeReports(reportRows));
       setPatientFound(true);
     } catch (error) {
       setSearchError(getApiErrorMessage(error, "Unable to fetch patient details."));
       setPatientFound(false);
       setResolvedPatientName(dummyPatient.name);
       setResolvedPatientAbhaId("");
+      setPatientReports(dummyPatient.reports);
     }
 
     setSearched(true);
@@ -226,23 +257,44 @@ function DoctorDashboard() {
     return Object.keys(errors).length === 0;
   };
 
-  const handlePrescriptionSubmit = (e) => {
+  const handlePrescriptionSubmit = async (e) => {
     e.preventDefault();
     if (validatePrescriptionForm()) {
+      if (!resolvedPatientAbhaId) {
+        setSearchError("Search a patient before saving prescription.");
+        return;
+      }
+
       const today = new Date().toISOString().split("T")[0];
       const prescriptionObject = {
         date: today,
-        doctor: "Dr. Adrian Carter",
-        specialization: "Cardiology",
+        doctor: doctorProfile.fullName,
+        specialization: doctorProfile.specialization,
         diagnosis: prescriptionForm.diagnosis,
         medicines: prescriptionForm.medicines,
         instructions: prescriptionForm.instructions
       };
 
-      console.log("Saving new patient prescription:", prescriptionObject);
+      const prescriptionText = [
+        `Diagnosis: ${prescriptionForm.diagnosis}`,
+        "Medicines:",
+        ...prescriptionForm.medicines.map((med) => `- ${med.name} | ${med.dosage} | ${med.frequency} | ${med.duration}`),
+        `Instructions: ${prescriptionForm.instructions || "None"}`,
+      ].join("\n");
 
-      // TODO:
-      // Replace with backend API integration later
+      try {
+        await api.addPrescription({
+          date: today,
+          abhaId: resolvedPatientAbhaId,
+          patientName: resolvedPatientName,
+          age: 46,
+          prescriptionText,
+          doctorSignature: doctorProfile.fullName,
+        });
+      } catch (error) {
+        setSearchError(getApiErrorMessage(error, "Unable to save prescription."));
+        return;
+      }
 
       setPrescriptions((prev) => [
         {
@@ -251,6 +303,12 @@ function DoctorDashboard() {
         },
         ...prev
       ]);
+
+      setPrescriptionForm({
+        diagnosis: "",
+        medicines: [{ name: "", dosage: "", frequency: "", duration: "" }],
+        instructions: "",
+      });
 
       setShowPrescriptionModal(false);
     }
@@ -536,7 +594,7 @@ function DoctorDashboard() {
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {dummyPatient.reports.map((r) => (
+                    {(patientReports.length > 0 ? patientReports : dummyPatient.reports).map((r) => (
                       <div
                         key={r.id}
                         className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center justify-between space-x-3 hover:border-blue-300 transition-colors"

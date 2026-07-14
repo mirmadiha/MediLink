@@ -63,12 +63,72 @@ public class PrescriptionStorageService : IPrescriptionStorageService
         return fileName;
     }
 
+    public async Task<List<PrescriptionFileResponse>> GetReportsByAbhaIdAsync(string abhaId)
+    {
+        var folderPath = GetReportsFolderPath();
+        if (!Directory.Exists(folderPath))
+        {
+            return new List<PrescriptionFileResponse>();
+        }
+
+        var safeAbhaId = SanitizeFileSegment(abhaId);
+        var files = Directory.GetFiles(folderPath, $"{safeAbhaId}_*.txt")
+            .OrderByDescending(x => x)
+            .ToList();
+
+        var rows = new List<PrescriptionFileResponse>();
+        foreach (var file in files)
+        {
+            rows.Add(new PrescriptionFileResponse
+            {
+                FileName = Path.GetFileName(file),
+                CreatedOn = File.GetCreationTime(file),
+                Content = await File.ReadAllTextAsync(file)
+            });
+        }
+
+        return rows;
+    }
+
+    public async Task<string> SaveReportAsync(string abhaId, string title, string reportType, string reportDate, string hospital, string notes, string content)
+    {
+        var safeAbhaId = SanitizeFileSegment(abhaId);
+        var safeTitle = SanitizeFileSegment(title);
+        var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
+
+        var folderPath = GetReportsFolderPath();
+        Directory.CreateDirectory(folderPath);
+
+        var fileName = $"{safeAbhaId}_{timestamp}_{safeTitle}.txt";
+        var filePath = Path.Combine(folderPath, fileName);
+
+        var fileContent = new StringBuilder()
+            .AppendLine($"Title: {title}")
+            .AppendLine($"Type: {reportType}")
+            .AppendLine($"Date: {reportDate}")
+            .AppendLine($"Hospital: {hospital}")
+            .AppendLine($"Notes: {notes}")
+            .AppendLine("Content:")
+            .AppendLine(content)
+            .ToString();
+
+        await File.WriteAllTextAsync(filePath, fileContent);
+        return fileName;
+    }
+
     private string GetPrescriptionsFolderPath()
     {
         var medicalRecordsRoot = Path.Combine(_environment.ContentRootPath, "MedicalRecords");
         Directory.CreateDirectory(medicalRecordsRoot);
         Directory.CreateDirectory(Path.Combine(medicalRecordsRoot, "Reports"));
         return Path.Combine(medicalRecordsRoot, "Prescriptions");
+    }
+
+    private string GetReportsFolderPath()
+    {
+        var medicalRecordsRoot = Path.Combine(_environment.ContentRootPath, "MedicalRecords");
+        Directory.CreateDirectory(medicalRecordsRoot);
+        return Path.Combine(medicalRecordsRoot, "Reports");
     }
 
     private static string SanitizeFileSegment(string value)

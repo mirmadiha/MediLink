@@ -142,6 +142,30 @@ public class DoctorController : ControllerBase
         return Ok(model);
     }
 
+    [HttpGet("reports")]
+    public async Task<IActionResult> Reports([FromQuery] string? abhaId = null)
+    {
+        if (string.IsNullOrWhiteSpace(abhaId))
+        {
+            return Ok(new List<PrescriptionFileResponse>());
+        }
+
+        var patientUser = await _userManager.Users.FirstOrDefaultAsync(x => x.AbhaId == abhaId);
+        if (patientUser == null)
+        {
+            return NotFound(new { message = "Patient not found for this ABHA ID." });
+        }
+
+        var patientRoles = await _userManager.GetRolesAsync(patientUser);
+        if (!patientRoles.Contains(Roles.Patient))
+        {
+            return BadRequest(new { message = "This ABHA ID does not belong to a patient." });
+        }
+
+        var reports = await _prescriptionStorage.GetReportsByAbhaIdAsync(abhaId);
+        return Ok(reports);
+    }
+
     [HttpGet("ai-summary")]
     public IActionResult AISummary()
     {

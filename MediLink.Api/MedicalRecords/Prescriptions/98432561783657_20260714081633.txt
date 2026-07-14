@@ -1,0 +1,9 @@
+Date: 2026-07-14
+Name: Maryam
+Age: 46
+Prescription:
+Diagnosis: Head ache
+Medicines:
+- Paracetamol | 500mg | Once daily | 2
+Instructions: None
+Doctor's Signature: Masooma

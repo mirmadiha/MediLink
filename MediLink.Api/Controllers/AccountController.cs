@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.IO;
 
 namespace MediLink.Api.Controllers;
 
@@ -166,5 +167,78 @@ public class AccountController : ControllerBase
 
         model.Prescriptions = await _prescriptionStorage.GetByAbhaIdAsync(user.AbhaId);
         return Ok(model);
+    }
+
+    [HttpGet("my-reports")]
+    [Authorize(Roles = Roles.Patient)]
+    public async Task<IActionResult> MyReports()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized(new { message = "User not found." });
+        }
+
+        if (string.IsNullOrWhiteSpace(user.AbhaId))
+        {
+            return Ok(new List<PrescriptionFileResponse>());
+        }
+
+        var reports = await _prescriptionStorage.GetReportsByAbhaIdAsync(user.AbhaId);
+        return Ok(reports);
+    }
+
+    [HttpPost("my-reports")]
+    [Authorize(Roles = Roles.Patient)]
+    public async Task<IActionResult> UploadMyReport([FromForm] UploadReportRequest model)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized(new { message = "User not found." });
+        }
+
+        if (string.IsNullOrWhiteSpace(user.AbhaId))
+        {
+            return BadRequest(new { message = "ABHA ID missing for this patient." });
+        }
+
+        if (model.File == null || model.File.Length == 0)
+        {
+            return BadRequest(new { message = "Report file is required." });
+        }
+
+        if (string.IsNullOrWhiteSpace(model.Title))
+        {
+            return BadRequest(new { message = "Report title is required." });
+        }
+
+        if (string.IsNullOrWhiteSpace(model.Type))
+        {
+            return BadRequest(new { message = "Report type is required." });
+        }
+
+        var extension = Path.GetExtension(model.File.FileName);
+        if (!string.Equals(extension, ".txt", StringComparison.OrdinalIgnoreCase))
+        {
+            return BadRequest(new { message = "Only .txt report files are allowed." });
+        }
+
+        string content;
+        using (var reader = new StreamReader(model.File.OpenReadStream()))
+        {
+            content = await reader.ReadToEndAsync();
+        }
+
+        var fileName = await _prescriptionStorage.SaveReportAsync(
+            user.AbhaId,
+            model.Title.Trim(),
+            model.Type.Trim(),
+            model.Date,
+            model.Hospital,
+            model.Notes,
+            content);
+
+        return Ok(new { message = "Report uploaded successfully.", fileName });
     }
 }
