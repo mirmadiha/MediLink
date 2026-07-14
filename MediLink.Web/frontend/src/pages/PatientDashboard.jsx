@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import ProfileDropdown from "../components/ProfileDropdown";
-import { api } from "../services/api";
+import { api, getApiErrorMessage } from "../services/api";
 
 function PatientDashboard() {
   const navigate = useNavigate();
@@ -63,6 +63,11 @@ function PatientDashboard() {
           email: profile?.userName || "aisha@gmail.com",
           abhaId: profile?.abhaId || "1234-5678-9012",
         });
+
+        const serverReports = await api.myReports();
+        if (mounted) {
+          setReportsList((prev) => mergeReports(serverReports, prev));
+        }
       } catch {
         // Keep hardcoded fallback when API is unavailable.
       }
@@ -199,11 +204,38 @@ function PatientDashboard() {
     }
   };
 
+  const mapServerReportToUi = (report) => {
+    const lines = (report?.content || "").split(/\r?\n/);
+    const getValue = (prefix) => {
+      const line = lines.find((x) => x.startsWith(prefix));
+      return line ? line.replace(prefix, "").trim() : "";
+    };
+
+    const contentIndex = lines.findIndex((x) => x.trim() === "Content:");
+    const body = contentIndex >= 0 ? lines.slice(contentIndex + 1).join("\n").trim() : report?.content || "";
+    const dateValue = getValue("Date:") || new Date(report?.createdOn || Date.now()).toISOString().slice(0, 10);
+
+    return {
+      id: report?.fileName || `lr_${Date.now()}`,
+      name: getValue("Title:") || report?.fileName || "Uploaded Report",
+      date: formatReportDate(dateValue),
+      type: getValue("Type:") || "Text Report",
+      result: body || "No report content available.",
+      aiExplanation: `AI summary generated for ${getValue("Title:") || "uploaded report"}. Please discuss details with your doctor.`,
+    };
+  };
+
+  const mergeReports = (serverReports, previousReports) => {
+    const mappedServer = (serverReports || []).map(mapServerReportToUi);
+    const existingIds = new Set(mappedServer.map((x) => x.id));
+    const fallback = (previousReports || []).filter((x) => !existingIds.has(x.id));
+    return [...mappedServer, ...fallback];
+  };
+
   const handleFileSelected = (file) => {
     setUploadError("");
-    const allowedTypes = ["application/pdf", "image/png", "image/jpeg", "image/jpg"];
-    if (!allowedTypes.includes(file.type)) {
-      setUploadError("Invalid file type. Please upload a PDF, PNG, or JPG/JPEG report.");
+    if (!file.name.toLowerCase().endsWith(".txt")) {
+      setUploadError("Invalid file type. Please upload a .txt report.");
       setSelectedFile(null);
       return;
     }
@@ -220,7 +252,7 @@ function PatientDashboard() {
     }
   };
 
-  const handleUploadSubmit = (e) => {
+  const handleUploadSubmit = async (e) => {
     e.preventDefault();
     const errors = {};
     if (!selectedFile) {
@@ -240,27 +272,26 @@ function PatientDashboard() {
     setFormErrors(errors);
     if (Object.keys(errors).length > 0) return;
 
-    let aiExplanation = "";
-    if (uploadForm.type === "X-Ray" || uploadForm.type === "MRI" || uploadForm.type === "CT Scan") {
-      aiExplanation = `Your uploaded ${uploadForm.type} scan of the anatomical region has been successfully processed. The scans show normal structural integrity, intact joint alignment, and no signs of acute trauma or skeletal disruptions. Clear soft tissue outlines are observed.`;
-    } else if (uploadForm.type === "Blood Test" || uploadForm.type === "Urine Test") {
-      aiExplanation = `Your uploaded ${uploadForm.type} details have been parsed by MediLink's AI. Core metabolic panels, blood cell levels, and chemical components lie within stable baseline boundaries. No anomalies or severe flags are detected.`;
-    } else {
-      aiExplanation = `Your uploaded ${uploadForm.title} report has been analyzed by MediLink AI. All indicators appear healthy and lie within the normal reference thresholds. Please review these results with your attending clinician during follow-up visits.`;
+    const formData = new FormData();
+    formData.append("File", selectedFile);
+    formData.append("Title", uploadForm.title);
+    formData.append("Type", uploadForm.type);
+    formData.append("Hospital", uploadForm.hospital);
+    formData.append("Date", uploadForm.date);
+    formData.append("Notes", uploadForm.notes || "");
+
+    try {
+      await api.uploadMyReport(formData);
+      const serverReports = await api.myReports();
+      const merged = mergeReports(serverReports, reportsList);
+      setReportsList(merged);
+      if (merged.length > 0) {
+        setNewlyUploadedId(merged[0].id);
+      }
+    } catch (error) {
+      setUploadError(getApiErrorMessage(error, "Unable to upload report."));
+      return;
     }
-
-    const newReportId = "lr_" + Date.now();
-    const newReport = {
-      id: newReportId,
-      name: uploadForm.title,
-      date: formatReportDate(uploadForm.date),
-      type: uploadForm.type,
-      result: `File: ${selectedFile.name} | Facility: ${uploadForm.hospital} | Notes: ${uploadForm.notes || "None"}`,
-      aiExplanation: aiExplanation
-    };
-
-    setReportsList((prev) => [newReport, ...prev]);
-    setNewlyUploadedId(newReportId);
 
     // Reset and close
     setSelectedFile(null);
@@ -1089,7 +1120,7 @@ function PatientDashboard() {
                   <input 
                     type="file" 
                     id="fileInput" 
-                    accept=".pdf,.png,.jpg,.jpeg" 
+                    accept=".txt" 
                     className="hidden" 
                     onChange={(e) => {
                       const file = e.target.files[0];
@@ -1109,7 +1140,7 @@ function PatientDashboard() {
                       <div className="text-xs text-slate-500">
                         <span className="font-bold text-blue-600 hover:underline">Browse Files</span>
                         <span className="mx-1">or drag & drop your report here</span>
-                        <p className="text-[10px] text-slate-400 mt-1">PDF, PNG, JPG up to 20MB</p>
+                        <p className="text-[10px] text-slate-400 mt-1">TXT up to 20MB</p>
                       </div>
                     )}
                   </div>

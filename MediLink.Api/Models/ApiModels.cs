@@ -230,3 +230,16 @@ public class PatientPrescriptionPageResponse
     public string PatientName { get; set; } = string.Empty;
     public List<PrescriptionFileResponse> Prescriptions { get; set; } = new();
 }
+
+public class UploadReportRequest
+{
+    public IFormFile? File { get; set; }
+
+    public string Title { get; set; } = string.Empty;
+
+    public string Type { get; set; } = string.Empty;
+
+    public string Hospital { get; set; } = string.Empty;
+    public string Date { get; set; } = string.Empty;
+    public string Notes { get; set; } = string.Empty;
+}

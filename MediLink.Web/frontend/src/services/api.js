@@ -61,19 +61,21 @@ function getBaseUrls() {
 async function request(path, options = {}) {
 	const baseUrls = getBaseUrls();
 	let lastError;
+	const isFormDataBody = typeof FormData !== "undefined" && options?.body instanceof FormData;
+	const headers = {
+		...(isFormDataBody ? {} : { "Content-Type": "application/json" }),
+		...(options.headers || {}),
+	};
 
 	for (const baseUrl of baseUrls) {
 		try {
 			const response = await fetch(`${baseUrl}${path}`, {
 				credentials: "include",
-				headers: {
-					"Content-Type": "application/json",
-					...(options.headers || {}),
-				},
+				headers,
 				...options,
 			});
 
-			const isJson = response.headers.get("content-type")?.includes("application/json");
+			const isJson = response.headers.get("content-type")?.includes("json");
 			const payload = isJson ? await response.json() : null;
 
 			if (!response.ok) {
@@ -137,6 +139,12 @@ export const api = {
 		});
 	},
 	myPrescriptions: () => request("/api/account/my-prescriptions"),
+	myReports: () => request("/api/account/my-reports"),
+	uploadMyReport: (formData) =>
+		request("/api/account/my-reports", {
+			method: "POST",
+			body: formData,
+		}),
 
 	listHospitals: () => request("/api/hospitals"),
 	hospitalOptions: () => request("/api/hospitals/options"),
@@ -184,6 +192,7 @@ export const api = {
 
 	doctorDashboard: (abhaId) => request(`/api/doctor/dashboard?abhaId=${encodeURIComponent(abhaId ?? "")}`),
 	doctorPrescriptions: (abhaId) => request(`/api/doctor/prescriptions?abhaId=${encodeURIComponent(abhaId ?? "")}`),
+	doctorReports: (abhaId) => request(`/api/doctor/reports?abhaId=${encodeURIComponent(abhaId ?? "")}`),
 	doctorPrescriptionForm: (abhaId) =>
 		request(`/api/doctor/prescription-form?abhaId=${encodeURIComponent(abhaId ?? "")}`),
 	addPrescription: (data) =>
@@ -200,6 +209,13 @@ export function getApiErrorMessage(error, fallback = "Something went wrong") {
 
 	if (error.payload?.errors?.length) {
 		return error.payload.errors.join(" ");
+	}
+
+	if (error.payload?.errors && typeof error.payload.errors === "object") {
+		const firstError = Object.values(error.payload.errors).flat()[0];
+		if (firstError) {
+			return firstError;
+		}
 	}
 
 	if (error.payload?.message) {
