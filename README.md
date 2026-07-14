@@ -28,13 +28,13 @@ The platform also leverages AI to summarize medical reports, generate AI health 
 
 ## Features
 
-### 👤 Patient Portal
+### Patient Portal
 * **Secure Auth**: JWT-validated stateless session login.
 * **Health Record Upload**: Drag-and-drop file uploader for reports (PDF/PNG/JPG).
 * **Consolidated Profile**: View personal ABHA ID, age, blood group, and medical history.
 * **Interactive Prescriptions**: View active medications, dosage plans, and prescribing doctors.
 
-### 🩺 Doctor Workspace
+### Doctor Workspace
 * **Secure Lookup**: Search patients via unique ABHA IDs.
 * **Patient History Summary**: Access patient files, allergies, and chronic conditions upon consent.
 * **Interactive Prescription Builder**: Add/remove prescription rows in real-time, detailing dosage, duration, and clinical notes.
