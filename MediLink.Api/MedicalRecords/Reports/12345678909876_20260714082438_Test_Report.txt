@@ -1,7 +1,0 @@
-Title: Test Report
-Type: Blood Test
-Date: 2026-07-14
-Hospital: SKIMS
-Notes: test
-Content:
-test patient report
