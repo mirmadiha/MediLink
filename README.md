@@ -1,4 +1,4 @@
-# 🩺 MediLink
+# MediLink
 
 An AI-powered Digital Health Record Platform for Smarter, Safer Healthcare.
 
@@ -9,20 +9,15 @@ An AI-powered Digital Health Record Platform for Smarter, Safer Healthcare.
   <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-18-blue?style=for-the-badge&logo=react" alt="React 18" /></a>
 </p>
 
-<!-- Project Screenshot Placeholder -->
-<p align="center">
-  <img src="frontend/public/medilink_app_hero_mockup.png" alt="MediLink Dashboard Mockup" width="90%" style="border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);" />
-</p>
-
 ---
 
-## 🚨 Problem Statement
+## Problem Statement
 
 During consultations, patients often forget to share critical medical history, including drug allergies, ongoing medications, chronic illnesses, or previous treatments. This is especially challenging in Jammu & Kashmir, where patients frequently consult multiple healthcare providers across different clinics and locations. Without a unified, patient-centric record system that securely shares medical histories under strict patient consent verification, doctors are forced to make decisions based on incomplete clinical information. This results in duplicate diagnostic tests, repeated antibiotic prescriptions, and critical gaps in care.
 
 ---
 
-## 📍 Why It Matters in Jammu & Kashmir
+## Why It Matters in Jammu & Kashmir
 
 * **Fragmented Health Logs**: Patient health records are scattered across independent clinics and hospitals with no centralized interoperability.
 * **Clinic Hopping**: Patients regularly move between different providers, preventing clinicians from referencing previous treatments.
@@ -31,27 +26,27 @@ During consultations, patients often forget to share critical medical history, i
 
 ---
 
-## ✨ Features
+## Features
 
-### 👤 Patient
+### Patient
 * **Secure Auth**: JWT-validated stateless session login.
 * **Health Record Upload**: Drag-and-drop file uploader for scans and reports.
 * **Consolidated Profile**: View personal ABHA ID, demographics, and clinical history.
 * **AI Patient Summary**: Get clear, simplified explanations of raw diagnostic metrics.
 * **Medical Timeline**: View health events sorted chronologically on a vertical timeline.
 
-### 👨‍⚕️ Doctor
+### Doctor
 * **Patient Search**: Lookup patients securely using unique ABHA IDs.
 * **History Lookup**: Access clinical charts, timelines, and summaries upon explicit patient consent.
 * **Prescription Builder**: Add/remove medicine rows dynamically in real-time.
 * **AI Patient Overview**: Review clinical alerts, allergies, and chronic conditions compiled by AI.
 
-### 🛡️ Admin
+### Admin
 * **User Management**: Onboard and manage practicing clinicians and hospital roles.
 * **Platform Monitoring**: Monitor registry activities and platform statistics.
 * **Record Management**: Oversee record access logs and audit trails.
 
-### 🤖 AI
+### AI
 * **Medical Report Summarization**: Translates raw diagnostic parameters into plain language.
 * **Patient Overview**: Consolidates patient profiles to highlight critical allergies and medical risks.
 * **Timeline Generation**: Dynamically maps previous events to generate a visual timeline.
@@ -59,7 +54,7 @@ During consultations, patients often forget to share critical medical history, i
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 | :--- | :--- |
@@ -71,7 +66,7 @@ During consultations, patients often forget to share critical medical history, i
 
 ---
 
-## 🚀 How to Run Locally
+## How to Run Locally
 
 ### Prerequisites
 * Node.js (v18+)
@@ -103,13 +98,13 @@ dotnet run
 
 ---
 
-## 🌐 Live Demo
+## Live Demo
 
-> 🚧 Live demo coming soon.
+> Live demo coming soon.
 
 ---
 
-## 🚀 Future Improvements
+## Future Improvements
 
 * **ABHA ID Integration**: Connect directly with the official ABDM (Ayushman Bharat Digital Mission) registry APIs.
 * **Laboratory Integration**: Automate scan delivery directly from lab systems to patient vaults.
@@ -121,7 +116,7 @@ dotnet run
 
 ---
 
-## 👥 Team
+## Team
 
 * **Maha Mateen** - Student (GitHub: [@mahamateen3009](https://github.com/mahamateen3009))
 * **Qazi Isra** - Student (GitHub: [@QaziIsra](https://github.com/QaziIsra))
@@ -131,6 +126,6 @@ dotnet run
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
