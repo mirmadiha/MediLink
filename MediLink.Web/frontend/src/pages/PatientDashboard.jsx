@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import ProfileDropdown from "../components/ProfileDropdown";
+import { api } from "../services/api";
 
 function PatientDashboard() {
   const navigate = useNavigate();
@@ -32,6 +33,11 @@ function PatientDashboard() {
     notes: ""
   });
   const [formErrors, setFormErrors] = useState({});
+  const [profileIdentity, setProfileIdentity] = useState({
+    fullName: "Aisha Ahmad",
+    email: "aisha@gmail.com",
+    abhaId: "1234-5678-9012",
+  });
 
   // Mock patient profile
   const patientProfile = {
@@ -41,6 +47,33 @@ function PatientDashboard() {
     gender: "Female",
     bloodGroup: "B+"
   };
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadProfileIdentity() {
+      try {
+        const profile = await api.profile();
+        if (!mounted) {
+          return;
+        }
+
+        setProfileIdentity({
+          fullName: profile?.fullName || "Aisha Ahmad",
+          email: profile?.userName || "aisha@gmail.com",
+          abhaId: profile?.abhaId || "1234-5678-9012",
+        });
+      } catch {
+        // Keep hardcoded fallback when API is unavailable.
+      }
+    }
+
+    loadProfileIdentity();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   // Chronic conditions checklist for Medical History modal
   const medicalHistoryData = {
@@ -60,7 +93,7 @@ function PatientDashboard() {
   const prescriptionsHistory = [
     {
       id: "pr1",
-      doctorName: "Dr. Adrian Carter",
+      doctorName: "Dr. Maqbool Khan",
       specialization: "Cardiology",
       date: "12 July 2026",
       hospital: "District Hospital Srinagar",
@@ -76,7 +109,7 @@ function PatientDashboard() {
     },
     {
       id: "pr2",
-      doctorName: "Dr. Sarah Jenkins",
+      doctorName: "Dr. Sarah Mir",
       specialization: "Neurology",
       date: "03 July 2026",
       hospital: "SMHS Hospital",
@@ -90,7 +123,7 @@ function PatientDashboard() {
     },
     {
       id: "pr3",
-      doctorName: "Dr. Adrian Carter",
+      doctorName: "Dr. Maqbool Khan",
       specialization: "Cardiology",
       date: "15 April 2026",
       hospital: "District Hospital Srinagar",
@@ -268,10 +301,13 @@ function PatientDashboard() {
 
             {/* Profile Dropdown loaded with Patient info */}
             <ProfileDropdown
-              fullName={patientProfile.name}
-              email="aisha@gmail.com"
+              fullName={profileIdentity.fullName}
+              email={profileIdentity.email}
               role="Patient"
-              onLogout={() => navigate("/login")}
+              onLogout={async () => {
+                await api.logout();
+                navigate("/login");
+              }}
             />
           </div>
         }
@@ -282,12 +318,15 @@ function PatientDashboard() {
                 AA
               </div>
               <div>
-                <p className="text-sm font-bold text-slate-800">{patientProfile.name}</p>
-                <p className="text-xs text-slate-400">ABHA ID: {patientProfile.abhaId}</p>
+                <p className="text-sm font-bold text-slate-800">{profileIdentity.fullName}</p>
+                <p className="text-xs text-slate-400">ABHA ID: {profileIdentity.abhaId}</p>
               </div>
             </div>
             <button
-              onClick={() => navigate("/login")}
+              onClick={async () => {
+                await api.logout();
+                navigate("/login");
+              }}
               className="w-full text-center py-2.5 text-base font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-sm"
             >
               Logout
@@ -310,7 +349,7 @@ function PatientDashboard() {
             </h1>
           </div>
           <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">
-            Welcome, {patientProfile.name}
+            Welcome, {profileIdentity.fullName}
           </h2>
           <p className="text-sm font-medium text-slate-500 mt-1">
             Access your secure digital health record, review prescriptions, understand your health using AI, and manage your medical information.
@@ -329,8 +368,8 @@ function PatientDashboard() {
                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/10 to-transparent"></div>
               </div>
               <div>
-                <h3 className="text-base font-extrabold text-slate-900 leading-tight">{patientProfile.name}</h3>
-                <p className="text-xs text-slate-500 font-mono mt-0.5">ABHA ID: {patientProfile.abhaId}</p>
+                <h3 className="text-base font-extrabold text-slate-900 leading-tight">{profileIdentity.fullName}</h3>
+                <p className="text-xs text-slate-500 font-mono mt-0.5">ABHA ID: {profileIdentity.abhaId}</p>
               </div>
             </div>
 
@@ -554,7 +593,7 @@ function PatientDashboard() {
 
             {/* Greeting */}
             <div className="text-sm text-slate-700 leading-relaxed">
-              <p className="font-bold text-slate-800">Hello Aisha,</p>
+              <p className="font-bold text-slate-800">Hello {profileIdentity.fullName?.split(" ")[0] || "Patient"},</p>
               <p className="text-slate-500 mt-1">Based on your available health records, here is an easy-to-understand summary of your current health.</p>
             </div>
 
