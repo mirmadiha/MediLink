@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bell, Search, AlertTriangle, ShieldCheck, Activity, X, Heart, Eye, EyeOff, User, Mail, ShieldAlert, Plus, Trash2, Calendar, FileText, CheckCircle2, ChevronDown, ChevronUp, Stethoscope, Clock } from "lucide-react";
 import Navbar from "../components/Navbar";
 import ProfileDropdown from "../components/ProfileDropdown";
+import { api, getApiErrorMessage } from "../services/api";
 
 function DoctorDashboard() {
   const navigate = useNavigate();
@@ -12,6 +13,14 @@ function DoctorDashboard() {
   const [searchError, setSearchError] = useState("");
   const [searched, setSearched] = useState(false);
   const [patientFound, setPatientFound] = useState(false);
+  const [resolvedPatientName, setResolvedPatientName] = useState("Aisha Ahmad");
+  const [resolvedPatientAbhaId, setResolvedPatientAbhaId] = useState("");
+  const [doctorProfile, setDoctorProfile] = useState({
+    fullName: "Doctor",
+    userName: "",
+    specialization: "General",
+    hospitalName: "Hospital",
+  });
 
   // Modal display states
   const [showSummaryModal, setShowSummaryModal] = useState(false);
@@ -50,7 +59,7 @@ function DoctorDashboard() {
     {
       id: "p1",
       date: "2026-06-25",
-      doctor: "Dr. Adrian Carter",
+      doctor: "Dr. Maqbool Khan",
       specialization: "Cardiology",
       diagnosis: "Essential Hypertension",
       medicines: [
@@ -61,7 +70,7 @@ function DoctorDashboard() {
     {
       id: "p2",
       date: "2026-07-03",
-      doctor: "Dr. Sarah Jenkins",
+      doctor: "Dr. Sarah Mir",
       specialization: "Neurology",
       diagnosis: "Migraine with Aura",
       medicines: [
@@ -86,22 +95,72 @@ function DoctorDashboard() {
   });
   const [formErrors, setFormErrors] = useState({});
 
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadDoctorProfile() {
+      try {
+        const profile = await api.profile();
+        if (!mounted) {
+          return;
+        }
+
+        setDoctorProfile({
+          fullName: profile?.fullName || "Doctor",
+          userName: profile?.userName || "",
+          specialization: profile?.specialization || "General",
+          hospitalName: profile?.hospitalName || "Hospital",
+        });
+      } catch {
+        // Non-blocking profile fallback.
+      }
+    }
+
+    loadDoctorProfile();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const runPatientSearch = async () => {
     setSearchError("");
     if (!abhaId.trim()) {
       setSearchError("ABHA ID cannot be empty");
       setSearched(false);
       setPatientFound(false);
+      setResolvedPatientAbhaId("");
       return;
     }
 
-    if (abhaId.trim() === dummyPatient.abhaId) {
+    try {
+      const response = await api.doctorDashboard(abhaId.trim());
+      const backendName = response?.patient?.fullName;
+
+      if (!backendName) {
+        setPatientFound(false);
+        setResolvedPatientName(dummyPatient.name);
+        setResolvedPatientAbhaId("");
+        setSearched(true);
+        return;
+      }
+
+      setResolvedPatientName(backendName);
+      setResolvedPatientAbhaId(abhaId.trim());
       setPatientFound(true);
-    } else {
+    } catch (error) {
+      setSearchError(getApiErrorMessage(error, "Unable to fetch patient details."));
       setPatientFound(false);
+      setResolvedPatientName(dummyPatient.name);
+      setResolvedPatientAbhaId("");
     }
+
     setSearched(true);
+  };
+
+  const handleSearchSubmit = async (e) => {
+    e.preventDefault();
+    await runPatientSearch();
   };
 
   // Medicine dynamically-rendered row handlers
@@ -229,10 +288,13 @@ function DoctorDashboard() {
 
             {/* Profile Dropdown loaded with Doctor info */}
             <ProfileDropdown
-              fullName="Dr. Adrian Carter"
-              email="dr.carter@medilink.com"
+              fullName={doctorProfile.fullName}
+              email={doctorProfile.userName}
               role="Doctor"
-              onLogout={() => navigate("/login")}
+              onLogout={async () => {
+                await api.logout();
+                navigate("/login");
+              }}
             />
           </div>
         }
@@ -243,12 +305,15 @@ function DoctorDashboard() {
                 AC
               </div>
               <div>
-                <p className="text-sm font-bold text-slate-800">Dr. Adrian Carter</p>
-                <p className="text-xs text-slate-400">Cardiology • Srinagar Hospital</p>
+                <p className="text-sm font-bold text-slate-800">{doctorProfile.fullName}</p>
+                <p className="text-xs text-slate-400">{doctorProfile.specialization} • {doctorProfile.hospitalName}</p>
               </div>
             </div>
             <button
-              onClick={() => navigate("/login")}
+              onClick={async () => {
+                await api.logout();
+                navigate("/login");
+              }}
               className="w-full text-center py-2.5 text-base font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-sm"
             >
               Logout
@@ -301,7 +366,8 @@ function DoctorDashboard() {
               />
             </div>
             <button
-              type="submit"
+              type="button"
+              onClick={runPatientSearch}
               disabled={abhaId.trim() === ""}
               className={`px-5 py-2.5 text-sm font-semibold rounded-lg shadow-sm transition-all text-center flex items-center justify-center cursor-pointer ${abhaId.trim() === ""
                 ? "bg-slate-200 text-slate-400 cursor-not-allowed"
@@ -343,8 +409,8 @@ function DoctorDashboard() {
                         AA
                       </div>
                       <div>
-                        <h3 className="text-lg font-extrabold text-slate-900 leading-tight">{dummyPatient.name}</h3>
-                        <p className="text-xs text-slate-500 font-mono mt-0.5">ABHA ID: {dummyPatient.abhaId}</p>
+                        <h3 className="text-lg font-extrabold text-slate-900 leading-tight">{resolvedPatientName}</h3>
+                        <p className="text-xs text-slate-500 font-mono mt-0.5">ABHA ID: {resolvedPatientAbhaId || abhaId}</p>
                       </div>
                     </div>
 
@@ -547,7 +613,7 @@ function DoctorDashboard() {
                 <span className="text-xl">🧠</span>
                 <div>
                   <h3 className="text-lg font-bold text-slate-900">AI Medical Summary</h3>
-                  <p className="text-xs text-slate-400">Intelligent clinical summary for Aisha Ahmad</p>
+                  <p className="text-xs text-slate-400">Intelligent clinical summary for {resolvedPatientName}</p>
                 </div>
               </div>
               <button
@@ -563,7 +629,7 @@ function DoctorDashboard() {
               <div className="bg-slate-50 border border-slate-200 rounded-xl p-4.5">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Clinical Summary</h4>
                 <p className="text-sm text-slate-700 leading-relaxed mt-1">
-                  Aisha Ahmad is a 46-year-old female presenting with a history of type-2 diabetes and essential hypertension. Her recent records display a high chronic glycemic index (HbA1c: 6.8%). She displays documented penicillin hypersensitivity and recurrent respiratory infections.
+                  {resolvedPatientName} is a 46-year-old female presenting with a history of type-2 diabetes and essential hypertension. Her recent records display a high chronic glycemic index (HbA1c: 6.8%). She displays documented penicillin hypersensitivity and recurrent respiratory infections.
                 </p>
               </div>
 
@@ -644,7 +710,7 @@ function DoctorDashboard() {
                 <span className="text-xl">💊</span>
                 <div>
                   <h3 className="text-lg font-bold text-slate-900">Create Prescription</h3>
-                  <p className="text-xs text-slate-400">Add digital script details for Aisha Ahmad</p>
+                  <p className="text-xs text-slate-400">Add digital script details for {resolvedPatientName}</p>
                 </div>
               </div>
               <button
@@ -829,7 +895,7 @@ function DoctorDashboard() {
                 <span className="text-xl">📄</span>
                 <div>
                   <h3 className="text-lg font-bold text-slate-900">Previous Prescriptions</h3>
-                  <p className="text-xs text-slate-400">Clinical logs for Aisha Ahmad</p>
+                  <p className="text-xs text-slate-400">Clinical logs for {resolvedPatientName}</p>
                 </div>
               </div>
               <button
