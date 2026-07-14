@@ -1,0 +1,7 @@
+Date: 2026-07-14
+Name: Maryam
+Age: 36
+Prescription:
+Headache
+Panadol
+Doctor's Signature: Masooma

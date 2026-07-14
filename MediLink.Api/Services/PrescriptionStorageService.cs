@@ -65,7 +65,10 @@ public class PrescriptionStorageService : IPrescriptionStorageService
 
     private string GetPrescriptionsFolderPath()
     {
-        return Path.Combine(_environment.ContentRootPath, "Prescriptions");
+        var medicalRecordsRoot = Path.Combine(_environment.ContentRootPath, "MedicalRecords");
+        Directory.CreateDirectory(medicalRecordsRoot);
+        Directory.CreateDirectory(Path.Combine(medicalRecordsRoot, "Reports"));
+        return Path.Combine(medicalRecordsRoot, "Prescriptions");
     }
 
     private static string SanitizeFileSegment(string value)

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ShieldCheck, Eye, EyeOff, Mail, Lock, CheckCircle2, Server } from "lucide-react";
 import Navbar from "../components/Navbar";
+import { api, getApiErrorMessage } from "../services/api";
 
 function Login() {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ function Login() {
   // Error States
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serverError, setServerError] = useState("");
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -29,6 +31,9 @@ function Login() {
     // Clear errors on field change
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+    if (serverError) {
+      setServerError("");
     }
   };
 
@@ -54,25 +59,46 @@ function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
       setIsSubmitting(true);
-      
-      // Log the form data to console as requested
-      console.log("Submitting login form:", {
-        email: formData.email,
-        password: formData.password,
-        rememberMe: formData.rememberMe,
-      });
 
-      // TODO: Integrate backend authentication API here later
+      try {
+        await api.login({
+          email: formData.email,
+          password: formData.password,
+        });
 
-      // Simulate successful login delay and redirect to dashboard
-      setTimeout(() => {
-        setIsSubmitting(false);
+        const profile = await api.profile({ forceFresh: true });
+        const role = (profile?.role || "").toLowerCase();
+
+        if (role === "masteradmin") {
+          navigate("/master/dashboard");
+          return;
+        }
+
+        if (role === "admin") {
+          navigate("/admin/dashboard");
+          return;
+        }
+
+        if (role === "doctor") {
+          navigate("/doctor/dashboard");
+          return;
+        }
+
+        if (role === "patient") {
+          navigate("/patient/dashboard");
+          return;
+        }
+
         navigate("/patient/dashboard");
-      }, 1000);
+      } catch (error) {
+        setServerError(getApiErrorMessage(error, "Unable to login."));
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -206,6 +232,11 @@ function Login() {
 
               {/* Form */}
               <form onSubmit={handleSubmit} className="space-y-5">
+                {serverError && (
+                  <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                    {serverError}
+                  </div>
+                )}
                 
                 {/* Email Address */}
                 <div>

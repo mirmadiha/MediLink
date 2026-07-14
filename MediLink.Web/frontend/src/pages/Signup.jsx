@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ShieldCheck, Eye, EyeOff, User, Mail, Phone, Lock, ArrowRight, ShieldAlert, Sparkles, CheckCircle2, Server } from "lucide-react";
 import Navbar from "../components/Navbar";
+import { api, getApiErrorMessage } from "../services/api";
 
 function Signup() {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ function Signup() {
   // Error States
   const [errors, setErrors] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [serverError, setServerError] = useState("");
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -34,6 +36,9 @@ function Signup() {
     // Clear field-specific error as they type
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+    if (serverError) {
+      setServerError("");
     }
   };
 
@@ -65,6 +70,13 @@ function Signup() {
       }
     }
 
+    // ABHA ID (required by current backend contract)
+    if (!formData.abhaId.trim()) {
+      newErrors.abhaId = "ABHA ID is required";
+    } else if (!/^\d{14}$/.test(formData.abhaId.trim())) {
+      newErrors.abhaId = "ABHA ID must be exactly 14 digits";
+    }
+
     // Password Strength Check
     if (!formData.password) {
       newErrors.password = "Password is required";
@@ -88,15 +100,27 @@ function Signup() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
       setIsSubmitted(true);
-      // Simulate API registration delay
-      setTimeout(() => {
-        alert("Account created successfully!");
+
+      try {
+        await api.signup({
+          fullName: formData.fullName,
+          email: formData.email,
+          password: formData.password,
+          confirmPassword: formData.confirmPassword,
+          abhaId: formData.abhaId.trim(),
+          otpCode: "1234",
+        });
+
         navigate("/login");
-      }, 1000);
+      } catch (error) {
+        setServerError(getApiErrorMessage(error, "Unable to create account."));
+      } finally {
+        setIsSubmitted(false);
+      }
     }
   };
 
@@ -230,6 +254,11 @@ function Signup() {
 
               {/* Form */}
               <form onSubmit={handleSubmit} className="space-y-4">
+                {serverError && (
+                  <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                    {serverError}
+                  </div>
+                )}
                 
                 {/* Full Name */}
                 <div>
@@ -324,8 +353,9 @@ function Signup() {
                         className="block w-full pl-10 pr-3 py-2.5 text-sm rounded-lg bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-blue-500 focus:outline-none focus:ring-1 transition-all"
                       />
                     </div>
+                    {errors.abhaId && <p className="text-xs text-red-500 mt-1">{errors.abhaId}</p>}
                     <p className="text-[10px] text-slate-400 mt-1 leading-normal">
-                      Your ABHA ID will help link your medical records in future versions.
+                      Backend currently requires a valid 14-digit ABHA ID.
                     </p>
                   </div>
                 </div>

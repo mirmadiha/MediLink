@@ -112,6 +112,13 @@ public class HospitalsController : ControllerBase
         return Ok(hospitals);
     }
 
+    [HttpGet("admins/count")]
+    public async Task<IActionResult> AdminCount()
+    {
+        var admins = await _userManager.GetUsersInRoleAsync(Roles.Admin);
+        return Ok(new { count = admins.Count });
+    }
+
     [HttpPost("admins")]
     public async Task<IActionResult> CreateAdmin([FromBody] CreateAdminRequest model)
     {

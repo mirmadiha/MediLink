@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ShieldCheck, Eye, EyeOff, User, Mail, Lock, Stethoscope, FileText, CheckCircle2, Server, ArrowLeft } from "lucide-react";
 import Navbar from "../components/Navbar";
+import { api, getApiErrorMessage } from "../services/api";
 
-function CreateDoctor({ doctors, setDoctors }) {
+function CreateDoctor() {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = !!id;
@@ -23,25 +24,50 @@ function CreateDoctor({ doctors, setDoctors }) {
   // Errors state
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serverError, setServerError] = useState("");
 
-  // Load existing doctor details in Edit mode
+  // Load existing doctor details in edit mode.
   useEffect(() => {
-    if (isEditMode) {
-      const doc = doctors.find((d) => d.id === id);
-      if (doc) {
+    let isMounted = true;
+
+    async function loadDoctor() {
+      if (!isEditMode || !id) {
+        return;
+      }
+
+      try {
+        const doc = await api.getDoctor(id);
+        if (!isMounted) {
+          return;
+        }
+
         setFormData({
-          name: doc.name || "",
-          username: doc.username || "",
-          password: "mockpassword123", // Pre-fill with placeholder for validation
+          name: doc.fullName || "",
+          username: doc.email || "",
+          password: "", // Optional for update; not sent in edit payload.
           specialization: doc.specialization || "",
           stateRegistrationNumber: doc.stateRegistrationNumber || "",
         });
-      } else {
-        // Redirect if doctor ID is invalid
-        navigate("/admin/dashboard");
+      } catch (loadError) {
+        if (!isMounted) {
+          return;
+        }
+
+        if (loadError.status === 401 || loadError.status === 403) {
+          navigate("/login");
+          return;
+        }
+
+        setServerError(getApiErrorMessage(loadError, "Unable to load doctor details."));
       }
     }
-  }, [id, isEditMode, doctors, navigate]);
+
+    loadDoctor();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [id, isEditMode, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -52,6 +78,9 @@ function CreateDoctor({ doctors, setDoctors }) {
     // Clear field-specific error
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+    if (serverError) {
+      setServerError("");
     }
   };
 
@@ -71,10 +100,12 @@ function CreateDoctor({ doctors, setDoctors }) {
       }
     }
 
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters long";
+    if (!isEditMode) {
+      if (!formData.password) {
+        newErrors.password = "Password is required";
+      } else if (formData.password.length < 6) {
+        newErrors.password = "Password must be at least 6 characters long";
+      }
     }
 
     if (!formData.specialization.trim()) {
@@ -89,57 +120,36 @@ function CreateDoctor({ doctors, setDoctors }) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
       setIsSubmitting(true);
 
-      const doctorObject = {
-        name: formData.name,
-        username: formData.username,
-        password: formData.password,
-        specialization: formData.specialization,
-        stateRegistrationNumber: formData.stateRegistrationNumber,
-      };
-
-      // Log the doctor object to the console as requested
-      console.log(isEditMode ? "Updating doctor record:" : "Creating doctor record:", doctorObject);
-
-      // TODO:
-      // Replace with backend API
-
-      setTimeout(() => {
-        setIsSubmitting(false);
-
-        if (isEditMode) {
-          // Update in local dummy state
-          setDoctors((prev) =>
-            prev.map((doc) =>
-              doc.id === id
-                ? {
-                    ...doc,
-                    name: formData.name,
-                    username: formData.username,
-                    specialization: formData.specialization,
-                    stateRegistrationNumber: formData.stateRegistrationNumber,
-                  }
-                : doc
-            )
-          );
-        } else {
-          // Append new doctor to local dummy state
-          const newDoc = {
-            id: Date.now().toString(),
-            name: formData.name,
-            username: formData.username,
+      try {
+        if (isEditMode && id) {
+          await api.updateDoctor(id, {
+            fullName: formData.name,
+            email: formData.username,
             specialization: formData.specialization,
             stateRegistrationNumber: formData.stateRegistrationNumber,
-          };
-          setDoctors((prev) => [...prev, newDoc]);
+          });
+        } else {
+          await api.createDoctor({
+            fullName: formData.name,
+            email: formData.username,
+            password: formData.password,
+            specialization: formData.specialization,
+            stateRegistrationNumber: formData.stateRegistrationNumber,
+            role: "Doctor",
+          });
         }
 
         navigate("/admin/dashboard");
-      }, 800);
+      } catch (submitError) {
+        setServerError(getApiErrorMessage(submitError, "Unable to save doctor."));
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -178,6 +188,7 @@ function CreateDoctor({ doctors, setDoctors }) {
         <div className="max-w-6xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch relative">
           
           {/* Left Column (Shared Security Vault Illustration Panel) */}
+          {!isEditMode && (
           <div className="hidden lg:flex lg:col-span-5 flex-col justify-between p-8 bg-slate-900 border border-slate-800 text-white rounded-3xl relative overflow-hidden shadow-2xl">
             {/* Background design glow */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -242,9 +253,10 @@ function CreateDoctor({ doctors, setDoctors }) {
               <span>HIPAA & SOC-2 Ready</span>
             </div>
           </div>
+          )}
 
           {/* Right Column ( Roster Form Card ) */}
-          <div className="col-span-12 lg:col-span-7 flex flex-col justify-center">
+          <div className={`col-span-12 ${isEditMode ? "lg:col-span-12" : "lg:col-span-7"} flex flex-col justify-center`}>
             <div className="bg-white border border-slate-200 shadow-xl rounded-2xl p-6 sm:p-8 max-w-xl w-full mx-auto relative">
               
               {/* Header */}
@@ -261,6 +273,11 @@ function CreateDoctor({ doctors, setDoctors }) {
 
               {/* Form */}
               <form onSubmit={handleSubmit} className="space-y-4">
+                {serverError && (
+                  <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                    {serverError}
+                  </div>
+                )}
                 
                 {/* Doctor Name */}
                 <div>
@@ -313,7 +330,7 @@ function CreateDoctor({ doctors, setDoctors }) {
                 {/* Password */}
                 <div>
                   <label htmlFor="password" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                    Password
+                    {isEditMode ? "Password (Leave blank to keep unchanged)" : "Password"}
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
@@ -325,7 +342,7 @@ function CreateDoctor({ doctors, setDoctors }) {
                       name="password"
                       value={formData.password}
                       onChange={handleChange}
-                      placeholder="Enter access password"
+                      placeholder={isEditMode ? "Optional in edit mode" : "Enter access password"}
                       className={`block w-full pl-10 pr-10 py-2.5 text-sm rounded-lg bg-slate-50 border ${
                         errors.password ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50/10" : "border-slate-200 focus:border-blue-500 focus:ring-blue-500"
                       } text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 transition-all`}

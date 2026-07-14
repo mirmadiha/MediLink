@@ -1,10 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Bell, User, Pencil, Trash2, Plus, AlertTriangle, ShieldCheck, ChevronLeft, ChevronRight, Activity, LogOut } from "lucide-react";
 import Navbar from "../components/Navbar";
+import { api, getApiErrorMessage } from "../services/api";
 
-function AdminDashboard({ doctors, setDoctors }) {
+function AdminDashboard() {
   const navigate = useNavigate();
+  const [doctors, setDoctors] = useState([]);
+  const [profile, setProfile] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
 
   // Profile Dropdown state
   const [showDropdown, setShowDropdown] = useState(false);
@@ -13,16 +18,79 @@ function AdminDashboard({ doctors, setDoctors }) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [doctorToRemove, setDoctorToRemove] = useState(null);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadDashboard() {
+      setIsLoading(true);
+      setError("");
+
+      try {
+        const [doctorRows, profileResponse] = await Promise.all([
+          api.listDoctors(),
+          api.profile(),
+        ]);
+
+        if (!isMounted) {
+          return;
+        }
+
+        setDoctors(
+          (doctorRows || []).map((doc) => ({
+            id: doc.id,
+            name: doc.fullName,
+            username: doc.email,
+            specialization: doc.specialization,
+            stateRegistrationNumber: doc.stateRegistrationNumber,
+          }))
+        );
+        setProfile(profileResponse || null);
+      } catch (loadError) {
+        if (!isMounted) {
+          return;
+        }
+
+        if (loadError.status === 401) {
+          navigate("/login");
+          return;
+        }
+
+        if (loadError.status === 403) {
+          setError("You are signed in but do not have access to the hospital admin dashboard.");
+          return;
+        }
+
+        setError(getApiErrorMessage(loadError, "Unable to load dashboard."));
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    loadDashboard();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [navigate]);
+
   const handleRemoveClick = (doctor) => {
     setDoctorToRemove(doctor);
     setShowDeleteModal(true);
   };
 
-  const confirmRemove = () => {
+  const confirmRemove = async () => {
     if (doctorToRemove) {
-      setDoctors((prev) => prev.filter((doc) => doc.id !== doctorToRemove.id));
-      setShowDeleteModal(false);
-      setDoctorToRemove(null);
+      try {
+        await api.deleteDoctor(doctorToRemove.id);
+        setDoctors((prev) => prev.filter((doc) => doc.id !== doctorToRemove.id));
+      } catch (removeError) {
+        setError(getApiErrorMessage(removeError, "Unable to remove doctor."));
+      } finally {
+        setShowDeleteModal(false);
+        setDoctorToRemove(null);
+      }
     }
   };
 
@@ -30,8 +98,12 @@ function AdminDashboard({ doctors, setDoctors }) {
     navigate(`/admin/edit-doctor/${id}`);
   };
 
-  const handleLogout = () => {
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await api.logout();
+    } finally {
+      navigate("/login");
+    }
   };
 
   return (
@@ -60,19 +132,20 @@ function AdminDashboard({ doctors, setDoctors }) {
                 <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm">
                   HA
                 </div>
-                <span className="hidden sm:block text-sm font-semibold text-slate-700">Admin</span>
+                <span className="hidden sm:block text-sm font-semibold text-slate-700">{profile?.fullName || "Admin"}</span>
               </button>
 
               {showDropdown && (
                 <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 z-50 animate-in fade-in duration-200">
                   <div className="px-4 py-2 border-b border-slate-100">
                     <p className="text-xs text-slate-400">Signed in as</p>
-                    <p className="text-sm font-bold text-slate-800 truncate">admin@dh-srinagar.com</p>
+                    <p className="text-sm font-bold text-slate-800 truncate">{profile?.userName || "admin"}</p>
                   </div>
                   <button
                     onClick={handleLogout}
                     className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2 transition-colors cursor-pointer"
                   >
+                    <p className="text-sm font-bold text-slate-800">{profile?.fullName || "Admin"}</p>
                     <LogOut className="h-4 w-4" />
                     <span>Logout</span>
                   </button>
@@ -112,7 +185,7 @@ function AdminDashboard({ doctors, setDoctors }) {
               Welcome Back,
             </h1>
             <p className="text-2xl font-extrabold text-slate-900 tracking-tight mt-0.5">
-              Hospital Administrator
+              {profile?.fullName || "Hospital Administrator"}
             </p>
           </div>
           <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 flex items-center space-x-3">
@@ -121,10 +194,16 @@ function AdminDashboard({ doctors, setDoctors }) {
             </div>
             <div>
               <p className="text-[10px] font-bold tracking-wider text-blue-500 uppercase">Affiliated Hospital</p>
-              <p className="text-sm font-bold text-slate-800 mt-0.5">District Hospital Srinagar</p>
+              <p className="text-sm font-bold text-slate-800 mt-0.5">{profile?.hospitalName || "Hospital"}</p>
             </div>
           </div>
         </section>
+
+        {error && (
+          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
 
         {/* Doctors with Access Header */}
         <section className="space-y-4">
@@ -149,7 +228,11 @@ function AdminDashboard({ doctors, setDoctors }) {
           </div>
 
           {/* Table or Empty State */}
-          {doctors.length === 0 ? (
+          {isLoading ? (
+            <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center shadow-sm text-slate-500 text-sm">
+              Loading doctors...
+            </div>
+          ) : doctors.length === 0 ? (
             <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center max-w-xl mx-auto shadow-sm space-y-6">
               <div className="mx-auto w-16 h-16 rounded-full bg-slate-100 text-slate-400 border border-slate-200 flex items-center justify-center">
                 <Activity className="h-8 w-8" />
@@ -262,7 +345,7 @@ function AdminDashboard({ doctors, setDoctors }) {
               <div className="space-y-1">
                 <h3 className="text-lg font-bold text-slate-900">Remove Doctor?</h3>
                 <p className="text-sm text-slate-500 leading-normal">
-                  Are you sure you want to remove Dr. {doctorToRemove?.name}'s access? They will no longer be authorized to lookup patient archives at District Hospital Srinagar.
+                  Are you sure you want to remove Dr. {doctorToRemove?.name}'s access? They will no longer be authorized to lookup patient archives at {profile?.hospitalName || "Hospital"}.
                 </p>
               </div>
             </div>
