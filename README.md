@@ -1,4 +1,4 @@
-# 🩺 MediLink
+#  MediLink
 
 > An AI-powered unified healthcare platform that securely connects Patients, Doctors, and Healthcare Administrators through intelligent medical record management and AI-driven clinical insights.
 
@@ -10,7 +10,7 @@
 </p>
 ---
 
-## 🚨 Problem
+## Problem
 
 Patients often forget to share critical medical information such as allergies, ongoing medications, chronic illnesses, or previous treatments during consultations. This becomes even more challenging when visiting multiple hospitals or consulting doctors in different locations.
 
@@ -18,7 +18,7 @@ Without access to a patient's complete medical history, doctors may order duplic
 
 ---
 
-## 💡 Solution
+## Solution
 
 **MediLink** is a secure, AI-powered digital health record platform that enables authorized doctors to instantly access a patient's essential medical history with the patient's ABHA ID. By centralizing medical records in one place, it supports faster, safer, and more informed clinical decisions.
 
@@ -26,7 +26,7 @@ The platform also leverages AI to summarize medical reports, generate AI health 
 
 ---
 
-## ✨ Features
+## Features
 
 ### 👤 Patient Portal
 * **Secure Auth**: JWT-validated stateless session login.
@@ -40,11 +40,11 @@ The platform also leverages AI to summarize medical reports, generate AI health 
 * **Interactive Prescription Builder**: Add/remove prescription rows in real-time, detailing dosage, duration, and clinical notes.
 * **Chronological Timeline**: Track previous consultations on a clinical event timeline.
 
-### 🏢 Hospital Admin Dashboard
+### Hospital Admin Dashboard
 * **Staff Registries**: Register, onboard, and manage practicing clinical doctors.
 * **Platform Metrics**: View clinical counts and local hospital registries.
 
-### 🧠 AI Features
+### AI Features
 * **AI Medical Report Summary**: Explains raw lab scans in clear, patient-friendly language.
 * **AI Patient Overview**: Computes a patient summary showing critical alerts, warnings, and suggested habits.
 * **Medical Timeline**: Automatically parses record dates to arrange health events chronologically.
@@ -52,7 +52,7 @@ The platform also leverages AI to summarize medical reports, generate AI health 
 
 ---
 
-## 💻 Tech Stack
+## Tech Stack
 
 | Layer | Technology | Purpose |
 | :--- | :--- | :--- |
@@ -66,7 +66,7 @@ The platform also leverages AI to summarize medical reports, generate AI health 
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 MediLink/
@@ -86,7 +86,7 @@ MediLink/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 * **Node.js** (v18 or higher)
@@ -133,7 +133,7 @@ dotnet run
 
 ---
 
-## ⚙️ Environment Variables
+## Environment Variables
 
 ### Frontend (`frontend/.env`)
 * `VITE_API_URL`: Root address of the backend Web API (default: `http://localhost:5000/api`).
@@ -146,7 +146,7 @@ dotnet run
 
 ---
 
-## 👥 Team
+## Team
 * **Maha Mateen** - Student (GitHub: [@mahamateen3009](https://github.com/mahamateen3009))
 * **Qazi Isra** - Student (GitHub: [@QaziIsra](https://github.com/QaziIsra))
 * **Tamana Zehra** - Student (GitHub: [@tamanazehra](https://github.com/tamanazehra))
@@ -155,5 +155,5 @@ dotnet run
 
 ---
 
-## 📄 License
+## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
