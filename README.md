@@ -1,6 +1,6 @@
-#  MediLink
+# 🩺 MediLink
 
-> An AI-powered unified healthcare platform that securely connects Patients, Doctors, and Healthcare Administrators through intelligent medical record management and AI-driven clinical insights.
+An AI-powered Digital Health Record Platform for Smarter, Safer Healthcare.
 
 <p align="center">
   <a href="https://github.com/mirmadiha/MediLink"><img src="https://img.shields.io/github/stars/mirmadiha/MediLink?style=for-the-badge&color=blue" alt="Stars" /></a>
@@ -8,145 +8,121 @@
   <a href="https://dotnet.microsoft.com/download/dotnet/8.0"><img src="https://img.shields.io/badge/.NET-8.0-purple?style=for-the-badge&logo=dotnet" alt=".NET 8" /></a>
   <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-18-blue?style=for-the-badge&logo=react" alt="React 18" /></a>
 </p>
----
 
-## Problem
-
-Patients often forget to share critical medical information such as allergies, ongoing medications, chronic illnesses, or previous treatments during consultations. This becomes even more challenging when visiting multiple hospitals or consulting doctors in different locations.
-
-Without access to a patient's complete medical history, doctors may order duplicate tests, prescribe unnecessary antibiotics, or make treatment decisions with incomplete information. In regions like Kashmir, the lack of a unified, patient-centric health record system further impacts continuity of care and patient safety.
+<!-- Project Screenshot Placeholder -->
+<p align="center">
+  <img src="frontend/public/medilink_app_hero_mockup.png" alt="MediLink Dashboard Mockup" width="90%" style="border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);" />
+</p>
 
 ---
 
-## Solution
+## 🚨 Problem Statement
 
-**MediLink** is a secure, AI-powered digital health record platform that enables authorized doctors to instantly access a patient's essential medical history with the patient's ABHA ID. By centralizing medical records in one place, it supports faster, safer, and more informed clinical decisions.
-
-The platform also leverages AI to summarize medical reports, generate AI health overviews, and present medical history through an intuitive timeline—making healthcare information easier to understand for both doctors and patients while reducing duplicate tests and improving continuity of care.
+During consultations, patients often forget to share critical medical history, including drug allergies, ongoing medications, chronic illnesses, or previous treatments. This is especially challenging in Jammu & Kashmir, where patients frequently consult multiple healthcare providers across different clinics and locations. Without a unified, patient-centric record system that securely shares medical histories under strict patient consent verification, doctors are forced to make decisions based on incomplete clinical information. This results in duplicate diagnostic tests, repeated antibiotic prescriptions, and critical gaps in care.
 
 ---
 
-## Features
+## 📍 Why It Matters in Jammu & Kashmir
 
-### Patient Portal
+* **Fragmented Health Logs**: Patient health records are scattered across independent clinics and hospitals with no centralized interoperability.
+* **Clinic Hopping**: Patients regularly move between different providers, preventing clinicians from referencing previous treatments.
+* **Patient Safety Risks**: Lack of access to historical records leads to medication errors, high rates of duplicate diagnostic tests, and delayed diagnosis.
+* **Continuity of Care**: Unconsolidated files impact the management of chronic conditions and reduce the effectiveness of local healthcare systems.
+
+---
+
+## ✨ Features
+
+### 👤 Patient
 * **Secure Auth**: JWT-validated stateless session login.
-* **Health Record Upload**: Drag-and-drop file uploader for reports (PDF/PNG/JPG).
-* **Consolidated Profile**: View personal ABHA ID, age, blood group, and medical history.
-* **Interactive Prescriptions**: View active medications, dosage plans, and prescribing doctors.
+* **Health Record Upload**: Drag-and-drop file uploader for scans and reports.
+* **Consolidated Profile**: View personal ABHA ID, demographics, and clinical history.
+* **AI Patient Summary**: Get clear, simplified explanations of raw diagnostic metrics.
+* **Medical Timeline**: View health events sorted chronologically on a vertical timeline.
 
-### Doctor Workspace
-* **Secure Lookup**: Search patients via unique ABHA IDs.
-* **Patient History Summary**: Access patient files, allergies, and chronic conditions upon consent.
-* **Interactive Prescription Builder**: Add/remove prescription rows in real-time, detailing dosage, duration, and clinical notes.
-* **Chronological Timeline**: Track previous consultations on a clinical event timeline.
+### 👨‍⚕️ Doctor
+* **Patient Search**: Lookup patients securely using unique ABHA IDs.
+* **History Lookup**: Access clinical charts, timelines, and summaries upon explicit patient consent.
+* **Prescription Builder**: Add/remove medicine rows dynamically in real-time.
+* **AI Patient Overview**: Review clinical alerts, allergies, and chronic conditions compiled by AI.
 
-### Hospital Admin Dashboard
-* **Staff Registries**: Register, onboard, and manage practicing clinical doctors.
-* **Platform Metrics**: View clinical counts and local hospital registries.
+### 🛡️ Admin
+* **User Management**: Onboard and manage practicing clinicians and hospital roles.
+* **Platform Monitoring**: Monitor registry activities and platform statistics.
+* **Record Management**: Oversee record access logs and audit trails.
 
-### AI Features
-* **AI Medical Report Summary**: Explains raw lab scans in clear, patient-friendly language.
-* **AI Patient Overview**: Computes a patient summary showing critical alerts, warnings, and suggested habits.
-* **Medical Timeline**: Automatically parses record dates to arrange health events chronologically.
-* **Quick Health Review**: Flags potential drug-to-allergy conflicts instantly.
-
----
-
-## Tech Stack
-
-| Layer | Technology | Purpose |
-| :--- | :--- | :--- |
-| **Frontend** | React.js (v18) + Vite | Core SPA component tree and fast building engine |
-| **Styling** | Tailwind CSS (v4) | Responsive grids, shadows, and design tokens |
-| **Icons** | Lucide React | Lightweight, vector clinical icon library |
-| **Backend** | .NET 8 Web API | Restful routing gateways and authentication endpoints |
-| **ORM** | Entity Framework Core | Database migrations and relational model mapping |
-| **Database** | MS SQL Server | Structured data storage for users, records, and profiles |
-| **Security** | JWT Authentication | Role-based authorization walls using identity frameworks (`Patient`, `Doctor`, `Admin`) |
+### 🤖 AI
+* **Medical Report Summarization**: Translates raw diagnostic parameters into plain language.
+* **Patient Overview**: Consolidates patient profiles to highlight critical allergies and medical risks.
+* **Timeline Generation**: Dynamically maps previous events to generate a visual timeline.
+* **Quick Health Insights**: Flags potential drug-allergy conflicts automatically.
 
 ---
 
-## Project Structure
+## 🛠️ Tech Stack
 
-```
-MediLink/
-├── frontend/                     # React + Vite Client Application
-│   ├── public/                   # Static assets (favicons, mockups)
-│   ├── src/
-│   │   ├── components/           # Reusable UI elements (Navbar, Cards, Dropdowns)
-│   │   ├── pages/                # Dashboards (Patient, Doctor, Admin)
-│   │   └── App.jsx               # Router registry
-├── backend/                      # .NET 8 Web API Server
-│   ├── Controllers/              # REST Endpoints (Auth, Patients, Doctors)
-│   ├── Services/                 # Business logic and AI summarization handlers
-│   ├── Models/                   # SQL schemas and database tables
-│   └── Data/                     # DbContext database declarations
-└── README.md
-```
+| Layer | Technology |
+| :--- | :--- |
+| **Frontend** | React.js, Vite, Tailwind CSS |
+| **Backend** | .NET 8 Web API, Entity Framework Core |
+| **Database** | SQL Server |
+| **Authentication** | JWT (JSON Web Tokens) |
+| **Version Control** | Git & GitHub |
 
 ---
 
-## Getting Started
+## 🚀 How to Run Locally
 
 ### Prerequisites
-* **Node.js** (v18 or higher)
-* **.NET 8 SDK**
-* **MS SQL Server**
-* **Git**
+* Node.js (v18+)
+* .NET 8 SDK
+* SQL Server
+* Git
 
-### Clone the Repository
+### Clone Repository
 ```bash
 git clone https://github.com/mirmadiha/MediLink.git
 cd MediLink
 ```
 
-### Frontend Setup
+### Frontend
 ```bash
 cd frontend
 npm install
-```
-
-### Backend Setup
-```bash
-cd ../backend
-dotnet restore
-```
-
-### Database Setup
-Update the connection string in `backend/appsettings.json`, then run:
-```bash
-dotnet ef database update
-```
-
-### Run the Application
-Start the frontend dev server:
-```bash
-# In frontend/ directory
 npm run dev
 ```
 
-Start the backend server:
+### Backend
 ```bash
-# In backend/ directory
+cd ../backend
+dotnet restore
 dotnet run
 ```
 
----
-
-## Environment Variables
-
-### Frontend (`frontend/.env`)
-* `VITE_API_URL`: Root address of the backend Web API (default: `http://localhost:5000/api`).
-
-### Backend (`backend/appsettings.json`)
-* `ConnectionStrings:DefaultConnection`: Connection string for MS SQL Server instance.
-* `JWT:Secret`: Encription secret key for JWT token signatures.
-* `JWT:Issuer` / `JWT:Audience`: Token validation headers.
-* `AI:ApiKey`: API key configured to access summarization engines.
+*Note: Update the database connection string in `backend/appsettings.json` to point to your local SQL Server instance before running the backend application.*
 
 ---
 
-## Team
+## 🌐 Live Demo
+
+> 🚧 Live demo coming soon.
+
+---
+
+## 🚀 Future Improvements
+
+* **ABHA ID Integration**: Connect directly with the official ABDM (Ayushman Bharat Digital Mission) registry APIs.
+* **Laboratory Integration**: Automate scan delivery directly from lab systems to patient vaults.
+* **OCR for Medical Reports**: Implement Optical Character Recognition to automatically parse uploaded clinical printouts.
+* **AI-Powered Drug Interaction Alerts**: Provide real-time warnings on potential contraindications during prescription building.
+* **Emergency Access Consent**: Enable secure one-time emergency bypass mechanisms with patient audits.
+* **Hospital Interoperability**: Support native HL7/FHIR health data standards.
+* **Mobile Application**: Release dedicated Android and iOS companion apps.
+
+---
+
+## 👥 Team
+
 * **Maha Mateen** - Student (GitHub: [@mahamateen3009](https://github.com/mahamateen3009))
 * **Qazi Isra** - Student (GitHub: [@QaziIsra](https://github.com/QaziIsra))
 * **Tamana Zehra** - Student (GitHub: [@tamanazehra](https://github.com/tamanazehra))
@@ -155,5 +131,6 @@ dotnet run
 
 ---
 
-## License
+## 📄 License
+
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
