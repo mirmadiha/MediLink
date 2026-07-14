@@ -1,0 +1,9 @@
+# Ignore root dependencies
+node_modules/
+package-lock.json
+package.json
+.DS_Store
+*.suo
+*.sln
+.idea/
+.vscode/
