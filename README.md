@@ -8,11 +8,6 @@
   <a href="https://dotnet.microsoft.com/download/dotnet/8.0"><img src="https://img.shields.io/badge/.NET-8.0-purple?style=for-the-badge&logo=dotnet" alt=".NET 8" /></a>
   <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-18-blue?style=for-the-badge&logo=react" alt="React 18" /></a>
 </p>
-
-<p align="center">
-  <img src="frontend/public/medilink_app_hero_mockup.png" alt="MediLink Dashboard Mockup" width="90%" style="border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);" />
-</p>
-
 ---
 
 ## 🚨 Problem
