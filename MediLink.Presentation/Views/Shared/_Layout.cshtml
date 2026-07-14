@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MediLink</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="topbar">
+        <div class="container topbar-inner">
+            <a class="brand" asp-controller="Home" asp-action="Index">MediLink</a>
+            <nav class="top-nav" aria-label="Primary">
+                @if (!User.Identity?.IsAuthenticated ?? true)
+                {
+                    <a asp-controller="Account" asp-action="Login">Login</a>
+                    <a asp-controller="Account" asp-action="Signup">Signup</a>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Profile">Profile</a>
+                    <form class="topbar-logout" asp-controller="Account" asp-action="Logout" method="post">
+                        <button type="submit">Logout</button>
+                    </form>
+                }
+            </nav>
+        </div>
+    </header>
+
+    <main class="container content">
+        @RenderBody()
+        @if (!string.Equals(ViewData["Title"]?.ToString(), "Home", StringComparison.OrdinalIgnoreCase))
+        {
+            <div class="page-tools">
+                <button type="button"
+                        class="back-button"
+                        onclick="if (window.history.length > 1) { window.history.back(); } else { window.location.href='@Url.Action("Index", "Home")'; }">
+                    Back
+                </button>
+            </div>
+        }
+    </main>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
